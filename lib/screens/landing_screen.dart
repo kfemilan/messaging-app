@@ -42,42 +42,47 @@ class _LandingScreenState extends State<LandingScreen> {
                     ],
                   ),
                   Spacer(flex: 2),
-                  Container(
-                      width: MediaQuery.of(context).size.width * 0.7,
-                      height: MediaQuery.of(context).size.width * 0.15,
-                      child: ElevatedButton(
-                        child: Text('Log In'),
-                        onPressed: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => LoginScreen()));
-                        },
-                        style: ElevatedButton.styleFrom(
-                            primary: Color(0xFF006455),
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(30))),
-                      )),
+                  Hero(
+                    tag: 'lg',
+                    child: Container(
+                        width: MediaQuery.of(context).size.width * 0.7,
+                        height: MediaQuery.of(context).size.width * 0.15,
+                        child: ElevatedButton(
+                          child: Text('Log In'),
+                          onPressed: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => LoginScreen()));
+                          },
+                          style: ElevatedButton.styleFrom(
+                              primary: Color(0xFF01A38B),
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(30))),
+                        )),
+                  ),
                   Spacer(flex: 1),
-                  Container(
-                      width: MediaQuery.of(context).size.width * 0.7,
-                      height: MediaQuery.of(context).size.width * 0.15,
-                      child: TextButton(
-                        child: Text('Register',
-                            style: TextStyle(color: Color(0xFF01A38B))),
-                        onPressed: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => RegisterScreen()));
-                        },
-                        style: TextButton.styleFrom(
+                  Hero(
+                    tag: 'reg',
+                    child: Container(
+                        width: MediaQuery.of(context).size.width * 0.7,
+                        height: MediaQuery.of(context).size.width * 0.15,
+                        child: TextButton(
+                          child: Text('Register',
+                              style: TextStyle(color: Color(0xFF01A38B))),
+                          onPressed: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => RegisterScreen()));
+                          },
+                          style: TextButton.styleFrom(
                             backgroundColor: Colors.white,
                             shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(30)),
-                            side:
-                                BorderSide(color: Color(0xFF01A38B), width: 2)),
-                      )),
+                          ),
+                        )),
+                  ),
                 ],
               )),
         ),
@@ -92,7 +97,7 @@ class CurvePainter extends CustomPainter {
     var paint = Paint();
     var path = Path();
 
-    paint.color = Color(0xFF01A38B);
+    paint.color = Color(0xFF006455);
     paint.style = PaintingStyle.fill;
 
     // path.moveTo(0, size.height * 0.6); // Starting Point
