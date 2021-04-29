@@ -1,5 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:messaging_app/screens/home_screen.dart';
 import 'package:messaging_app/screens/landing_screen.dart';
 import 'package:messaging_app/models/Constants.dart';
 
@@ -12,9 +13,6 @@ void main() async {
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-        title: 'Messaging App',
-        theme: appTheme,
-        home: LandingScreen());
+    return MaterialApp(title: 'Messaging App', theme: appTheme, home: HomeScreen());
   }
 }

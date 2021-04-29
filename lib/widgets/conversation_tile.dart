@@ -27,7 +27,7 @@ class ConversationTile extends StatelessWidget {
             width: 60.0,
             margin: EdgeInsets.only(left: 20.0, right: 15.0),
             decoration: BoxDecoration(
-              border: Border.all(color: Theme.of(context).primaryColor),
+              border: Border.all(color: Colors.black),
               borderRadius: BorderRadius.all(Radius.circular(30.0)),
               // color: Colors.red,
             ),
@@ -37,8 +37,14 @@ class ConversationTile extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text("2Change2Sender:"),
-              Text("${this.message.message} ${this.message.timeSent.toString()}"), // Timestamp
+              Text(
+                "2Change2Sender:",
+                style: TextStyle(color: Colors.black),
+              ),
+              Text(
+                "${this.message.message} ${this.message.timeSent.toString()}",
+                style: TextStyle(color: Colors.black),
+              ), // Timestamp
             ],
           ),
         ],
