@@ -21,12 +21,12 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Theme.of(context).backgroundColor,
+        backgroundColor: Theme.of(context).accentColor,
         leading: Container(
           alignment: Alignment.center,
           // color: Colors.yellow, // To see boundaries
           child: IconButton(
-            icon: Icon(Icons.person, color: Theme.of(context).primaryColor),
+            icon: Icon(Icons.person, color: Theme.of(context).primaryColorLight),
             onPressed: () {
               // Logout functionality
             },
@@ -34,7 +34,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         actions: [
           IconButton(
-            icon: Icon(Icons.edit, color: Theme.of(context).primaryColor),
+            icon: Icon(Icons.edit, color: Theme.of(context).primaryColorLight),
             onPressed: () {
               // New Conversation
             },
@@ -45,9 +45,9 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             Text(
               "sent",
-              style: TextStyle(color: Theme.of(context).primaryColor),
+              style: TextStyle(fontFamily: "Barlow", color: Theme.of(context).primaryColorLight),
             ),
-            Text("ence", style: TextStyle(color: Theme.of(context).primaryColorDark)),
+            Text("ence", style: TextStyle(fontFamily: "Barlow", color: Theme.of(context).primaryColorDark)),
           ],
         ),
       ),
@@ -61,19 +61,19 @@ class _HomeScreenState extends State<HomeScreen> {
             alignment: Alignment.center,
             child: Container(
               decoration: BoxDecoration(
-                border: Border.all(color: Theme.of(context).primaryColor),
+                border: Border.all(color: Theme.of(context).primaryColorLight),
                 borderRadius: BorderRadius.all(Radius.circular(50.0)),
               ),
               alignment: Alignment.center,
               padding: EdgeInsets.symmetric(horizontal: 30.0),
               child: TextFormField(
                 controller: _searchConvo,
-                style: TextStyle(color: Theme.of(context).primaryColor),
+                style: TextStyle(color: Theme.of(context).primaryColorLight),
                 decoration: InputDecoration(
                   border: InputBorder.none,
                   hintText: "Search Conversation",
-                  hintStyle: TextStyle(color: Theme.of(context).primaryColor),
-                  icon: Icon(Icons.search, color: Theme.of(context).primaryColor),
+                  hintStyle: TextStyle(color: Theme.of(context).primaryColorLight),
+                  icon: Icon(Icons.search, color: Theme.of(context).primaryColorLight),
                 ),
               ),
             ),
@@ -88,7 +88,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
-        selectedItemColor: Theme.of(context).primaryColor,
+        selectedItemColor: Theme.of(context).primaryColorLight,
         selectedIconTheme: IconThemeData(size: 32.0),
         unselectedItemColor: Theme.of(context).primaryColorDark,
         unselectedIconTheme: IconThemeData(size: 20.0),

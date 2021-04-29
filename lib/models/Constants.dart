@@ -23,16 +23,10 @@ List<Conversation> dummyConversations = [
 
 ThemeData appTheme = ThemeData(
   textTheme: TextTheme(
-    headline6:
-        TextStyle(color: secondary, fontWeight: FontWeight.bold, fontSize: 15),
-    headline1: TextStyle(
-        color: primaryMedium,
-        fontWeight: FontWeight.w900,
-        fontSize: 45,
-        fontFamily: 'Barlow'),
-    bodyText2: TextStyle(color: secondary, fontSize: 15)
+    headline6: TextStyle(color: secondary, fontWeight: FontWeight.bold, fontSize: 15),
+    headline1: TextStyle(color: primaryMedium, fontWeight: FontWeight.w900, fontSize: 45, fontFamily: 'Barlow'),
+    bodyText2: TextStyle(color: secondary, fontSize: 15),
   ),
-  
   primaryColorLight: primaryLight,
   primaryColor: primaryMedium,
   primaryColorDark: primaryDark,
