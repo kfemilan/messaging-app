@@ -12,6 +12,8 @@ class HomeScreen extends StatefulWidget {
 
 // The screen where you can see all the conversations
 class _HomeScreenState extends State<HomeScreen> {
+  TextEditingController _searchConvo = new TextEditingController();
+
   List<Conversation> conversations = dummyConversations;
   int bottomNavIndex = 0;
 
@@ -51,15 +53,32 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       body: Column(
         children: [
+          // Search button
           Container(
             height: 50.0,
-            margin: EdgeInsets.symmetric(vertical: 6.0),
-            color: Colors.yellow,
+            margin: EdgeInsets.symmetric(vertical: 4.0),
+            padding: EdgeInsets.symmetric(vertical: 2.0, horizontal: MediaQuery.of(context).size.width * 0.08),
             alignment: Alignment.center,
-            child: TextFormField(
-              decoration: InputDecoration(icon: Icon(Icons.search)),
+            child: Container(
+              decoration: BoxDecoration(
+                border: Border.all(color: Theme.of(context).primaryColor),
+                borderRadius: BorderRadius.all(Radius.circular(50.0)),
+              ),
+              alignment: Alignment.center,
+              padding: EdgeInsets.symmetric(horizontal: 30.0),
+              child: TextFormField(
+                controller: _searchConvo,
+                style: TextStyle(color: Theme.of(context).primaryColor),
+                decoration: InputDecoration(
+                  border: InputBorder.none,
+                  hintText: "Search Conversation",
+                  hintStyle: TextStyle(color: Theme.of(context).primaryColor),
+                  icon: Icon(Icons.search, color: Theme.of(context).primaryColor),
+                ),
+              ),
             ),
           ),
+          // List of Conversations
           Expanded(
             child: ListView.builder(
               itemCount: conversations.length,

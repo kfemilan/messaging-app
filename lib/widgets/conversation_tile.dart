@@ -10,9 +10,21 @@ class ConversationTile extends StatelessWidget {
     return Container(
       height: 75.0,
       width: MediaQuery.of(context).size.width,
-      decoration: BoxDecoration(border: Border(top: BorderSide(width: 1.0), bottom: BorderSide(width: 1.0))),
+      margin: EdgeInsets.symmetric(vertical: 1.0),
+      decoration: BoxDecoration(
+        // color: Colors.grey,
+        border: Border.symmetric(
+          horizontal: BorderSide(width: 1.0, color: Colors.grey),
+        ),
+      ),
       alignment: Alignment.center,
-      child: Text("ToChangeToSenderName: ${this.message.message}"),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          // Profile Picture
+          Text("SenderName: ${this.message.message}"),
+        ],
+      ),
     );
   }
 }
