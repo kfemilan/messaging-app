@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:messaging_app/database/flutterfire.dart';
 
-import 'conversation_screen.dart';
 import 'home_screen.dart';
 
 class AuthenticationScreen extends StatefulWidget {
@@ -71,7 +70,7 @@ class _AuthenticationScreenState extends State<AuthenticationScreen> {
                       Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => ConversationScreen()));
+                              builder: (context) => HomeScreen()));
                       print('Successful');
                     }
                   },
