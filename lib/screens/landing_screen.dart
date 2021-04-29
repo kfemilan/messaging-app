@@ -55,10 +55,7 @@ class _LandingScreenState extends State<LandingScreen> {
                                 MaterialPageRoute(
                                     builder: (context) => LoginScreen()));
                           },
-                          style: ElevatedButton.styleFrom(
-                              primary: Color(0xFF01A38B),
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(30))),
+                          style: Theme.of(context).elevatedButtonTheme.style,
                         )),
                   ),
                   Spacer(flex: 1),
@@ -76,11 +73,7 @@ class _LandingScreenState extends State<LandingScreen> {
                                 MaterialPageRoute(
                                     builder: (context) => RegisterScreen()));
                           },
-                          style: TextButton.styleFrom(
-                            backgroundColor: Colors.white,
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(30)),
-                          ),
+                          style: Theme.of(context).textButtonTheme.style
                         )),
                   ),
                 ],
