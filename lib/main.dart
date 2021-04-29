@@ -15,6 +15,9 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
         title: 'Messaging App',
         theme: ThemeData(
+          primaryColor: Color(0xFF01A38B),
+          primaryColorDark: Color(0xFF003F35),
+          backgroundColor: Colors.white,
           elevatedButtonTheme: ElevatedButtonThemeData(
             style: ElevatedButton.styleFrom(
               primary: Color(0xFF01A38B),
@@ -34,6 +37,6 @@ class MyApp extends StatelessWidget {
             ),
           ),
         ),
-        home: LandingScreen());
+        home: HomeScreen());
   }
 }
