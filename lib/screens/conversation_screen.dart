@@ -1,6 +1,26 @@
-import 'package:flutter/material.dart';
+import 'dart:io';
 
-class ConversationScreen extends StatelessWidget {
+import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+
+class ConversationScreen extends StatefulWidget {
+  @override
+  _ConversationScreenState createState() => _ConversationScreenState();
+}
+
+class _ConversationScreenState extends State<ConversationScreen> {
+  File _image;
+  final picker = ImagePicker();
+
+  Future getImage(String option) async {
+    final pickedFile = await picker.getImage(
+        source: option == "Camera" ? ImageSource.camera : ImageSource.gallery);
+
+    setState(() {
+      if (pickedFile != null) _image = File(pickedFile.path);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -22,7 +42,14 @@ class ConversationScreen extends StatelessWidget {
             Expanded(child: Center(child: Text("List view here!"))),
             Row(
               children: [
-                IconButton(icon: Icon(Icons.image), onPressed: () {}),
+                IconButton(
+                  icon: Icon(Icons.camera_alt),
+                  onPressed: () => getImage("Camera"),
+                ),
+                IconButton(
+                  icon: Icon(Icons.image),
+                  onPressed: () => getImage("Gallery"),
+                ),
                 Expanded(
                   child: TextField(
                       decoration:
