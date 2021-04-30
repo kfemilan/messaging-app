@@ -86,6 +86,8 @@ class _LoginScreenState extends State<LoginScreen> {
                           style: Theme.of(context).textTheme.headline6),
                       Spacer(),
                       TextFormField(
+                        keyboardType: TextInputType.emailAddress,
+                        textInputAction: TextInputAction.next,
                         controller: _email,
                         style: Theme.of(context).textTheme.bodyText2,
                         decoration: InputDecoration(
