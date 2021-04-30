@@ -18,7 +18,8 @@ Future<bool> register(String email, String password, String name) async {
     String uID = FirebaseAuth.instance.currentUser.uid;
     DocumentReference docRef = FirebaseFirestore.instance.collection('Users').doc(uID);
     docRef.set({
-      'name' : name
+      'name' : name,
+      'email' : email,
     });
 
     return true;
@@ -38,6 +39,8 @@ Future<bool> register(String email, String password, String name) async {
 Future<bool> signOut() async {
   try {
     await FirebaseAuth.instance.signOut();
+    print('Signed Out!');
+    print(FirebaseAuth.instance.currentUser);
     return true;
   } catch (e) {
     print(e.toString());

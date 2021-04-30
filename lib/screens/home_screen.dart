@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:messaging_app/database/flutterfire.dart';
 import 'package:messaging_app/models/Constants.dart';
 import 'package:messaging_app/models/Conversation.dart';
 import 'package:messaging_app/widgets/conversation_tile.dart';
+
+import 'landing_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   HomeScreen({Key key}) : super(key: key);
@@ -26,9 +29,12 @@ class _HomeScreenState extends State<HomeScreen> {
           alignment: Alignment.center,
           // color: Colors.yellow, // To see boundaries
           child: IconButton(
-            icon: Icon(Icons.person, color: Theme.of(context).primaryColorLight),
+            icon:
+                Icon(Icons.person, color: Theme.of(context).primaryColorLight),
             onPressed: () {
-              // Logout functionality
+              signOut();
+              Navigator.pushReplacement(context,
+                  MaterialPageRoute(builder: (context) => LandingScreen()));
             },
           ),
         ),
@@ -45,9 +51,14 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             Text(
               "sent",
-              style: TextStyle(fontFamily: "Barlow", color: Theme.of(context).primaryColorLight),
+              style: TextStyle(
+                  fontFamily: "Barlow",
+                  color: Theme.of(context).primaryColorLight),
             ),
-            Text("ence", style: TextStyle(fontFamily: "Barlow", color: Theme.of(context).primaryColorDark)),
+            Text("ence",
+                style: TextStyle(
+                    fontFamily: "Barlow",
+                    color: Theme.of(context).primaryColorDark)),
           ],
         ),
       ),
@@ -57,7 +68,9 @@ class _HomeScreenState extends State<HomeScreen> {
           Container(
             height: 50.0,
             margin: EdgeInsets.symmetric(vertical: 4.0),
-            padding: EdgeInsets.symmetric(vertical: 2.0, horizontal: MediaQuery.of(context).size.width * 0.08),
+            padding: EdgeInsets.symmetric(
+                vertical: 2.0,
+                horizontal: MediaQuery.of(context).size.width * 0.08),
             alignment: Alignment.center,
             child: Container(
               decoration: BoxDecoration(
@@ -72,8 +85,10 @@ class _HomeScreenState extends State<HomeScreen> {
                 decoration: InputDecoration(
                   border: InputBorder.none,
                   hintText: "Search Conversation",
-                  hintStyle: TextStyle(color: Theme.of(context).primaryColorLight),
-                  icon: Icon(Icons.search, color: Theme.of(context).primaryColorLight),
+                  hintStyle:
+                      TextStyle(color: Theme.of(context).primaryColorLight),
+                  icon: Icon(Icons.search,
+                      color: Theme.of(context).primaryColorLight),
                 ),
               ),
             ),
@@ -82,7 +97,8 @@ class _HomeScreenState extends State<HomeScreen> {
           Expanded(
             child: ListView.builder(
               itemCount: conversations.length,
-              itemBuilder: (builderContext, i) => ConversationTile(conversations[i].getLatestMessage()),
+              itemBuilder: (builderContext, i) =>
+                  ConversationTile(conversations[i].getLatestMessage()),
             ),
           ),
         ],
@@ -95,7 +111,8 @@ class _HomeScreenState extends State<HomeScreen> {
         currentIndex: bottomNavIndex,
         onTap: (value) => setState(() => bottomNavIndex = value),
         items: [
-          BottomNavigationBarItem(label: "Conversations", icon: Icon(Icons.chat_bubble)),
+          BottomNavigationBarItem(
+              label: "Conversations", icon: Icon(Icons.chat_bubble)),
           BottomNavigationBarItem(label: "Friends", icon: Icon(Icons.group)),
         ],
       ),

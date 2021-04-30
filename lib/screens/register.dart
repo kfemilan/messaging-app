@@ -89,6 +89,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           style: Theme.of(context).textTheme.headline6),
                       Spacer(),
                       TextFormField(
+                        textCapitalization: TextCapitalization.words,
+                        textInputAction: TextInputAction.next,
                         controller: _name,
                         style: Theme.of(context).textTheme.bodyText2,
                         decoration: InputDecoration(
@@ -112,6 +114,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           style: Theme.of(context).textTheme.headline6),
                       Spacer(),
                       TextFormField(
+                        keyboardType: TextInputType.emailAddress,
+                        textInputAction: TextInputAction.next,
                         controller: _email,
                         style: Theme.of(context).textTheme.bodyText2,
                         decoration: InputDecoration(
