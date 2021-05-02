@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+
+import 'package:messaging_app/models/Constants.dart';
 import 'package:messaging_app/models/Message.dart';
 import 'package:messaging_app/screens/conversation_screen.dart';
-import 'package:messaging_app/models/Constants.dart';
 
 class ConversationTile extends StatelessWidget {
   const ConversationTile(this.message, {Key key}) : super(key: key);
@@ -13,8 +14,6 @@ class ConversationTile extends StatelessWidget {
     String time = "Time"; // Just in case of error
     DateTime messageDay = message.timeSent, today = DateTime.now(), lastWeek = DateTime.now().subtract(Duration(days: 7));
 
-    print(lastWeek.toString());
-    print((today.compareTo(lastWeek) >= 0));
     if (today.day == messageDay.day && today.month == messageDay.month && today.year == messageDay.year)
       time = DateFormat.jm().format(message.timeSent); // Same day, just time
     else if (messageDay.compareTo(lastWeek) >= 0)
