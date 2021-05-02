@@ -35,8 +35,8 @@ class _ConfirmCreateScreenState extends State<ConfirmCreateScreen> {
           IconButton(
             icon: Icon(Icons.arrow_forward_ios_rounded),
             onPressed: () async {
-              bool successful = await createGC(widget.selected, _gcName.text);
-              if (successful) {
+              int successful = await createConversation(finalSelected, _gcName.text);
+              if (successful == 1) {
                 Navigator.pop(context);
                 Navigator.pushReplacement(
                     context,
