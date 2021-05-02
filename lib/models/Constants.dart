@@ -24,6 +24,7 @@ List<Conversation> dummyConversations = [
       messages: [Message(message: "Nicolai", timeSent: DateTime.now().subtract(Duration(days: 9)))]),
   Conversation(name: "Conversation Name", messages: [Message(message: "Dotiloss", timeSent: DateTime.now().subtract(Duration(days: 31)))]),
 ];
+Message dummyMessage = Message(message: "Hi", timeSent: DateTime.now());
 
 ThemeData appTheme = ThemeData(
   textTheme: TextTheme(
