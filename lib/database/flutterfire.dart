@@ -4,8 +4,7 @@ import 'package:messaging_app/models/Account.dart';
 
 Future<bool> signIn(String email, String password) async {
   try {
-    await FirebaseAuth.instance
-        .signInWithEmailAndPassword(email: email, password: password);
+    await FirebaseAuth.instance.signInWithEmailAndPassword(email: email, password: password);
     return true;
   } catch (e) {
     print(e);
@@ -15,12 +14,10 @@ Future<bool> signIn(String email, String password) async {
 
 Future<bool> register(String email, String password, String name) async {
   try {
-    await FirebaseAuth.instance
-        .createUserWithEmailAndPassword(email: email, password: password);
+    await FirebaseAuth.instance.createUserWithEmailAndPassword(email: email, password: password);
 
     String uID = FirebaseAuth.instance.currentUser.uid;
-    DocumentReference docRef =
-        FirebaseFirestore.instance.collection('Users').doc(uID);
+    DocumentReference docRef = FirebaseFirestore.instance.collection('Users').doc(uID);
     docRef.set({
       'name': name,
       'email': email,
@@ -54,6 +51,8 @@ Future<bool> signOut() async {
 
 Future<int> createConversation(List<Account> users, String name) async {
   try {
+
+    // Get uID of current user
     var uID = FirebaseAuth.instance.currentUser.uid;
     List<String> userIDs = users.map((value) => value.id).toList();
     userIDs.add(uID);
@@ -67,6 +66,7 @@ Future<int> createConversation(List<Account> users, String name) async {
       }
     }
 
+
     DocumentReference conRef = await FirebaseFirestore.instance
         .collection('Conversations')
         .add({'name': name, 'people': userIDs});
@@ -77,6 +77,7 @@ Future<int> createConversation(List<Account> users, String name) async {
       userRef.update({
         'conversations': FieldValue.arrayUnion([conRef.id])
       });
+
     }
 
     return 1;

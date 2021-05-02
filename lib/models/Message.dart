@@ -1,7 +1,7 @@
 class Message {
   Message({this.senderId, this.timeSent, this.message});
 
-  int senderId;
+  String senderId;
   DateTime timeSent;
   String message;
 

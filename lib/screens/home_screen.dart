@@ -1,15 +1,16 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+
 import 'package:messaging_app/database/flutterfire.dart';
 import 'package:messaging_app/models/Constants.dart';
 import 'package:messaging_app/models/Conversation.dart';
+import 'package:messaging_app/screens/landing_screen.dart';
+import 'package:messaging_app/screens/new_conversation.dart';
 import 'package:messaging_app/widgets/conversation_tile.dart';
-
-import 'landing_screen.dart';
-import 'new_conversation.dart';
 
 class HomeScreen extends StatefulWidget {
   HomeScreen({Key key}) : super(key: key);
-
   @override
   _HomeScreenState createState() => _HomeScreenState();
 }
@@ -94,11 +95,29 @@ class _HomeScreenState extends State<HomeScreen> {
           // List of Conversations
           Expanded(
             // To change to Stream Builder once convos work
-            child: ListView.builder(
-              itemCount: conversations.length,
-              itemBuilder: (builderContext, i) => conversations[i].name.toLowerCase().contains(_searchConvo.value.text.toLowerCase())
-                  ? ConversationTile(conversations[i].name, conversations[i].getLatestMessage())
-                  : SizedBox(width: 0, height: 0),
+            child: StreamBuilder(
+              stream: FirebaseFirestore.instance
+                  .collection("Conversations")
+                  .where("People", arrayContains: FirebaseAuth.instance.currentUser.uid)
+                  .snapshots(),
+              builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                print(FirebaseAuth.instance.currentUser.uid);
+                if (!snapshot.hasData) return Center(child: CircularProgressIndicator());
+                return ListView(
+                  children: snapshot.data.docs.map((document) {
+                    return document['name'].toLowerCase().contains(_searchConvo.value.text.toLowerCase())
+                        ? ConversationTile(document.id, document['name'], dummyMessage)
+                        : SizedBox(width: 0, height: 0);
+                  }).toList(),
+                );
+              },
+              // return ListView.builder(
+              //   itemCount: conversations.length,
+              //   itemBuilder: (builderContext, i) => conversations[i].name.toLowerCase().contains(_searchConvo.value.text.toLowerCase())
+              //       ? ConversationTile(conversations[i].name, conversations[i].getLatestMessage())
+              //       : SizedBox(width: 0, height: 0),
+              // );
+              // },
             ),
           ),
         ],
