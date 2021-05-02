@@ -35,6 +35,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
+          elevation: 0.0,
           centerTitle: true,
           title: Column(
             children: [
@@ -56,7 +57,6 @@ class _ConversationScreenState extends State<ConversationScreen> {
             Expanded(
                 child: Container(
               padding: EdgeInsets.all(10.0),
-              color: Colors.grey[200],
               child: ListView.builder(
                   reverse: true,
                   itemCount: _messages.length,
@@ -83,23 +83,45 @@ class _ConversationScreenState extends State<ConversationScreen> {
                     );
                   }),
             )),
-            Row(
-              children: [
-                IconButton(
-                  icon: Icon(Icons.camera_alt),
-                  onPressed: () => getImage("Camera"),
-                ),
-                IconButton(
-                  icon: Icon(Icons.image),
-                  onPressed: () => getImage("Gallery"),
-                ),
-                Expanded(
-                  child: TextField(
-                      decoration:
-                          InputDecoration(hintText: "Enter your message...")),
-                ),
-                IconButton(icon: Icon(Icons.send), onPressed: () {}),
-              ],
+            Container(
+              child: Row(
+                children: [
+                  IconButton(
+                    color: Theme.of(context).primaryColorLight,
+                    icon: Icon(Icons.camera_alt),
+                    onPressed: () => getImage("Camera"),
+                  ),
+                  IconButton(
+                    color: Theme.of(context).primaryColorLight,
+                    icon: Icon(Icons.image),
+                    onPressed: () => getImage("Gallery"),
+                  ),
+                  Expanded(
+                    child: Container(
+                      margin: EdgeInsets.all(5.0),
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                            color: Theme.of(context).primaryColorLight),
+                        borderRadius: BorderRadius.all(Radius.circular(50.0)),
+                      ),
+                      child: TextFormField(
+                        style: TextStyle(fontSize: 13.0),
+                        decoration: InputDecoration(
+                            isDense: true,
+                            contentPadding: EdgeInsets.all(13.0),
+                            border: InputBorder.none,
+                            hintText: "Enter your message...",
+                            hintStyle: TextStyle(
+                                color: Theme.of(context).primaryColorLight)),
+                      ),
+                    ),
+                  ),
+                  IconButton(
+                      color: Theme.of(context).primaryColorLight,
+                      icon: Icon(Icons.send),
+                      onPressed: () {}),
+                ],
+              ),
             ),
           ],
         ));

@@ -22,7 +22,7 @@ class ChatBubble extends StatelessWidget {
             ),
             color: messages[index].senderId != 00
                 ? Theme.of(context).primaryColorLight
-                : Colors.white),
+                : Colors.grey[200]),
         child: Text(messages[index].message, style: TextStyle(color: color)));
   }
 }
