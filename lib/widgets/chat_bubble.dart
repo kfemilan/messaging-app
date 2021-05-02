@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:messaging_app/models/Message.dart';
 
@@ -9,6 +10,7 @@ class ChatBubble extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final userID = FirebaseAuth.instance.currentUser.uid;
     return Container(
         padding: EdgeInsets.all(10.0),
         decoration: BoxDecoration(
@@ -16,13 +18,13 @@ class ChatBubble extends StatelessWidget {
               topLeft: Radius.circular(12),
               topRight: Radius.circular(12),
               bottomLeft:
-                  Radius.circular(messages[index].senderId == 00 ? 12 : 0),
+                  Radius.circular(messages[index].senderId == userID ? 12 : 0),
               bottomRight:
-                  Radius.circular(messages[index].senderId == 00 ? 0 : 12),
+                  Radius.circular(messages[index].senderId == userID ? 0 : 12),
             ),
-            color: messages[index].senderId != 00
+            color: messages[index].senderId != userID
                 ? Theme.of(context).primaryColorLight
-                : Colors.grey[200]),
+                : Colors.grey[300]),
         child: Text(messages[index].message, style: TextStyle(color: color)));
   }
 }

@@ -1,10 +1,13 @@
 import 'dart:io';
 
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:messaging_app/models/Constants.dart';
 import 'package:messaging_app/models/Message.dart';
 import 'package:messaging_app/widgets/chat_bubble.dart';
+import 'package:path/path.dart';
 
 class ConversationScreen extends StatefulWidget {
   @override
@@ -13,21 +16,52 @@ class ConversationScreen extends StatefulWidget {
 
 class _ConversationScreenState extends State<ConversationScreen> {
   List<Message> _messages = [
-    Message(senderId: 01, message: "Hi!", timeSent: DateTime.now()),
-    Message(senderId: 00, message: "Hello!", timeSent: DateTime.now()),
-    Message(senderId: 01, message: "How are you?", timeSent: DateTime.now()),
+    Message(senderId: "asd", message: "Hi!", timeSent: DateTime.now()),
     Message(
-        senderId: 00, message: "I'm fine thank you!", timeSent: DateTime.now()),
+        senderId: FirebaseAuth.instance.currentUser.uid,
+        message: "Hello!",
+        timeSent: DateTime.now()),
+    Message(senderId: "asd", message: "How are you?", timeSent: DateTime.now()),
+    Message(
+        senderId: FirebaseAuth.instance.currentUser.uid,
+        message: "I'm fine thank you!",
+        timeSent: DateTime.now()),
   ].reversed.toList();
+
   File _image;
+  String imageUrl = kDefaultProfilePicture;
   final picker = ImagePicker();
+  final userID = FirebaseAuth.instance.currentUser.uid;
+
+  Future uploadImageToFirebase() async {
+    final imgName = basename(_image.path);
+    final _firebaseStorage = firebase_storage.FirebaseStorage.instance;
+    if (_image != null) {
+      //Upload to Firebase
+      var snapshot = await _firebaseStorage
+          .ref()
+          .child('$userID/$imgName')
+          .putFile(_image);
+      var downloadUrl = await snapshot.ref.getDownloadURL();
+      setState(() {
+        imageUrl = downloadUrl;
+        print(imageUrl);
+      });
+    } else {
+      print('No Image Path Received');
+    }
+  }
 
   Future getImage(String option) async {
     final pickedFile = await picker.getImage(
         source: option == "Camera" ? ImageSource.camera : ImageSource.gallery);
 
     setState(() {
-      if (pickedFile != null) _image = File(pickedFile.path);
+      if (pickedFile != null) {
+        _image = File(pickedFile.path);
+        // Temporary
+        uploadImageToFirebase();
+      }
     });
   }
 
@@ -62,11 +96,11 @@ class _ConversationScreenState extends State<ConversationScreen> {
                   itemCount: _messages.length,
                   itemBuilder: (_, index) {
                     return Row(
-                      mainAxisAlignment: _messages[index].senderId == 00
+                      mainAxisAlignment: _messages[index].senderId == userID
                           ? MainAxisAlignment.end
                           : MainAxisAlignment.start,
                       children: [
-                        if (_messages[index].senderId != 00)
+                        if (_messages[index].senderId != userID)
                           Image(
                               width: 35,
                               height: 35,
@@ -76,7 +110,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
                           child: ChatBubble(
                               messages: _messages,
                               index: index,
-                              color: _messages[index].senderId != 00
+                              color: _messages[index].senderId != userID
                                   ? Colors.white
                                   : Colors.black),
                         ),
