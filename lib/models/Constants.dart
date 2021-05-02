@@ -8,6 +8,7 @@ Color primaryMedium = Color(0xFF006455);
 Color primaryDark = Color(0xFF003F35);
 Color secondary = Colors.white;
 
+Message dummyMessage = Message(message: "Hi, this is a dummy message!", timeSent: DateTime.now());
 List<Conversation> dummyConversations = [
   Conversation(name: "Bible Studies", messages: [Message(message: "Hi", timeSent: DateTime.now())]),
   Conversation(name: "Holiness is Epic", messages: [Message(message: "Nice", timeSent: DateTime.now().subtract(Duration(days: 1)))]),
@@ -24,7 +25,6 @@ List<Conversation> dummyConversations = [
       messages: [Message(message: "Nicolai", timeSent: DateTime.now().subtract(Duration(days: 9)))]),
   Conversation(name: "Conversation Name", messages: [Message(message: "Dotiloss", timeSent: DateTime.now().subtract(Duration(days: 31)))]),
 ];
-Message dummyMessage = Message(message: "Hi", timeSent: DateTime.now());
 
 ThemeData appTheme = ThemeData(
   textTheme: TextTheme(

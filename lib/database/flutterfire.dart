@@ -4,8 +4,7 @@ import 'package:messaging_app/models/Account.dart';
 
 Future<bool> signIn(String email, String password) async {
   try {
-    await FirebaseAuth.instance
-        .signInWithEmailAndPassword(email: email, password: password);
+    await FirebaseAuth.instance.signInWithEmailAndPassword(email: email, password: password);
     return true;
   } catch (e) {
     print(e);
@@ -15,12 +14,10 @@ Future<bool> signIn(String email, String password) async {
 
 Future<bool> register(String email, String password, String name) async {
   try {
-    await FirebaseAuth.instance
-        .createUserWithEmailAndPassword(email: email, password: password);
+    await FirebaseAuth.instance.createUserWithEmailAndPassword(email: email, password: password);
 
     String uID = FirebaseAuth.instance.currentUser.uid;
-    DocumentReference docRef =
-        FirebaseFirestore.instance.collection('Users').doc(uID);
+    DocumentReference docRef = FirebaseFirestore.instance.collection('Users').doc(uID);
     docRef.set({
       'name': name,
       'email': email,
@@ -54,7 +51,6 @@ Future<bool> signOut() async {
 
 Future<bool> createPM(Account user) async {
   try {
-
     // Get uID of current user
     var uID = FirebaseAuth.instance.currentUser.uid;
 
@@ -62,15 +58,10 @@ Future<bool> createPM(Account user) async {
     var pmID = uID + "_" + user.id;
 
     //Add a conversation with blank name for PMs
-    await FirebaseFirestore.instance
-        .collection('Conversations').doc(pmID)
-        .set({"name": ""});
+    await FirebaseFirestore.instance.collection('Conversations').doc(pmID).set({"name": ""});
 
     //Get Reference of the Collection of People in a Conversation
-    CollectionReference peopleRef = FirebaseFirestore.instance
-        .collection('Conversations')
-        .doc(pmID)
-        .collection('People');
+    CollectionReference peopleRef = FirebaseFirestore.instance.collection('Conversations').doc(pmID).collection('People');
 
     // Add current user and target user as people in the conversation
     peopleRef.doc(user.id).set({});
@@ -87,17 +78,11 @@ Future<bool> createPM(Account user) async {
 
 Future<bool> createGC(List<Account> users, String gcName) async {
   try {
-
     // Add a Conversation with GC Name
-    DocumentReference conRef = await FirebaseFirestore.instance
-        .collection('Conversations')
-        .add({"name": gcName});
+    DocumentReference conRef = await FirebaseFirestore.instance.collection('Conversations').add({"name": gcName});
 
     // Get Refrence for Collection of People within the conversation
-    CollectionReference peopleRef = FirebaseFirestore.instance
-        .collection('Conversations')
-        .doc(conRef.id)
-        .collection('People');
+    CollectionReference peopleRef = FirebaseFirestore.instance.collection('Conversations').doc(conRef.id).collection('People');
 
     // get current user's ID
     var uID = FirebaseAuth.instance.currentUser.uid;

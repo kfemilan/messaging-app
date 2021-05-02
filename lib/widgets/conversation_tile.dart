@@ -8,8 +8,8 @@ import 'package:messaging_app/screens/conversation_screen.dart';
 import 'dart:math'; // for RNG
 
 class ConversationTile extends StatelessWidget {
-  const ConversationTile(this.name, this.message, {Key key}) : super(key: key);
-  final String name;
+  const ConversationTile(this.conversationId, this.name, this.message, {Key key}) : super(key: key);
+  final String name, conversationId;
   final Message message;
 
   @override

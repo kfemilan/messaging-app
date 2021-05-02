@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+
 import 'package:messaging_app/database/flutterfire.dart';
 import 'package:messaging_app/models/Constants.dart';
 import 'package:messaging_app/models/Conversation.dart';
@@ -9,7 +11,6 @@ import 'package:messaging_app/widgets/conversation_tile.dart';
 
 class HomeScreen extends StatefulWidget {
   HomeScreen({Key key}) : super(key: key);
-
   @override
   _HomeScreenState createState() => _HomeScreenState();
 }
@@ -95,15 +96,17 @@ class _HomeScreenState extends State<HomeScreen> {
           Expanded(
             // To change to Stream Builder once convos work
             child: StreamBuilder(
-              stream: FirebaseFirestore.instance.collection("Conversations").snapshots(),
+              stream: FirebaseFirestore.instance
+                  .collection("Conversations")
+                  .where("People", arrayContains: FirebaseAuth.instance.currentUser.uid)
+                  .snapshots(),
               builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-                // if (!snapshot.hasData) {
-                //   return Center(child: CircularProgressIndicator());
-                // }
+                print(FirebaseAuth.instance.currentUser.uid);
+                if (!snapshot.hasData) return Center(child: CircularProgressIndicator());
                 return ListView(
                   children: snapshot.data.docs.map((document) {
                     return document['name'].toLowerCase().contains(_searchConvo.value.text.toLowerCase())
-                        ? ConversationTile(document['name'], dummyMessage)
+                        ? ConversationTile(document.id, document['name'], dummyMessage)
                         : SizedBox(width: 0, height: 0);
                   }).toList(),
                 );
