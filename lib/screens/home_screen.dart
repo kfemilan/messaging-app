@@ -69,15 +69,22 @@ class _HomeScreenState extends State<HomeScreen> {
                 borderRadius: BorderRadius.all(Radius.circular(50.0)),
               ),
               alignment: Alignment.center,
-              padding: EdgeInsets.symmetric(horizontal: 30.0),
+              // padding: EdgeInsets.symmetric(horizontal: 30.0),
               child: TextFormField(
+                onChanged: (currentStr) {
+                  setState(() {
+                    // Nothing actually happens here lmao
+                    print("$currentStr | ${_searchConvo.value.text}");
+                  });
+                },
                 controller: _searchConvo,
                 style: TextStyle(color: Theme.of(context).primaryColorLight),
                 decoration: InputDecoration(
                   border: InputBorder.none,
                   hintText: "Search Conversation",
                   hintStyle: TextStyle(color: Theme.of(context).primaryColorLight),
-                  icon: Icon(Icons.search, color: Theme.of(context).primaryColorLight),
+                  prefixIcon: Icon(Icons.search, color: Theme.of(context).primaryColorLight),
+                  // icon: Icon(Icons.search, color: Theme.of(context).primaryColorLight),
                 ),
               ),
             ),
@@ -87,7 +94,9 @@ class _HomeScreenState extends State<HomeScreen> {
             // To change to Stream Builder once convos work
             child: ListView.builder(
               itemCount: conversations.length,
-              itemBuilder: (builderContext, i) => ConversationTile(conversations[i].getLatestMessage()),
+              itemBuilder: (builderContext, i) => conversations[i].name.toLowerCase().contains(_searchConvo.value.text.toLowerCase())
+                  ? ConversationTile(conversations[i].name, conversations[i].getLatestMessage())
+                  : SizedBox(width: 0, height: 0),
             ),
           ),
         ],

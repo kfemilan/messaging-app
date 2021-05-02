@@ -5,12 +5,16 @@ import 'package:messaging_app/models/Constants.dart';
 import 'package:messaging_app/models/Message.dart';
 import 'package:messaging_app/screens/conversation_screen.dart';
 
+import 'dart:math'; // for RNG
+
 class ConversationTile extends StatelessWidget {
-  const ConversationTile(this.message, {Key key}) : super(key: key);
+  const ConversationTile(this.name, this.message, {Key key}) : super(key: key);
+  final String name;
   final Message message;
 
   @override
   Widget build(BuildContext context) {
+    String sender = "";
     String time = "Time"; // Just in case of error
     DateTime messageDay = message.timeSent, today = DateTime.now(), lastWeek = DateTime.now().subtract(Duration(days: 7));
 
@@ -20,6 +24,10 @@ class ConversationTile extends StatelessWidget {
       time = DateFormat.E().format(message.timeSent); // WeekdayAbbr e.g. Fri
     else
       time = DateFormat.MMMd().format(message.timeSent); // MonthAbbr Date e.g. Mar 1
+
+    // to remove later
+    var rng = Random();
+    sender = ["Matthew", "Mark", "Luke", "John", "Acts"][rng.nextInt(5)];
 
     return Dismissible(
       key: Key(message.toString()),
@@ -95,13 +103,13 @@ class ConversationTile extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      "2Change2Sender",
+                      "$name",
                       style: TextStyle(color: Colors.black, fontWeight: FontWeight.w700, fontSize: 16.0),
                     ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text("${this.message.message}", style: TextStyle(color: Colors.grey)),
+                        Text("$sender: ${this.message.message}", style: TextStyle(color: Colors.grey)),
                         Text("$time", style: TextStyle(color: Colors.black)),
                       ],
                     ), // Timestamp
