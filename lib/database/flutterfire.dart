@@ -49,58 +49,40 @@ Future<bool> signOut() async {
   }
 }
 
-Future<bool> createPM(Account user) async {
+Future<int> createConversation(List<Account> users, String name) async {
   try {
+
     // Get uID of current user
     var uID = FirebaseAuth.instance.currentUser.uid;
-
-    // Create the ConversationID for Private Message
-    var pmID = uID + "_" + user.id;
-
-    //Add a conversation with blank name for PMs
-    await FirebaseFirestore.instance.collection('Conversations').doc(pmID).set({"name": ""});
-
-    //Get Reference of the Collection of People in a Conversation
-    CollectionReference peopleRef = FirebaseFirestore.instance.collection('Conversations').doc(pmID).collection('People');
-
-    // Add current user and target user as people in the conversation
-    peopleRef.doc(user.id).set({});
-    peopleRef.doc(uID).set({});
-    await FirebaseFirestore.instance.collection('Users').doc(uID).collection('Conversations').doc(pmID).set({});
-    await FirebaseFirestore.instance.collection('Users').doc(user.id).collection('Conversations').doc(pmID).set({});
-
-    return true;
-  } catch (e) {
-    print(e);
-    return false;
-  }
-}
-
-Future<bool> createGC(List<Account> users, String gcName) async {
-  try {
-    // Add a Conversation with GC Name
-    DocumentReference conRef = await FirebaseFirestore.instance.collection('Conversations').add({"name": gcName});
-
-    // Get Refrence for Collection of People within the conversation
-    CollectionReference peopleRef = FirebaseFirestore.instance.collection('Conversations').doc(conRef.id).collection('People');
-
-    // get current user's ID
-    var uID = FirebaseAuth.instance.currentUser.uid;
-
-    // Add the user as part of the people in the conversation
-    peopleRef.doc(uID).set({});
-    // Add the conversation as part of the conversations of that user
-    await FirebaseFirestore.instance.collection('Users').doc(uID).collection('Conversations').doc(conRef.id).set({});
-
-    // Do the same above, but for all the users added by the current user
-    for (var i = 0; i < users.length; i++) {
-      peopleRef.doc(users[i].id).set({});
-      await FirebaseFirestore.instance.collection('Users').doc(users[i].id).collection('Conversations').doc(conRef.id).set({});
+    List<String> userIDs = users.map((value) => value.id).toList();
+    userIDs.add(uID);
+    userIDs.sort();
+    
+    if (userIDs.length == 2){
+      QuerySnapshot x = await FirebaseFirestore.instance.collection("Conversations").where("people", isEqualTo: userIDs).get();
+      print(x.size);
+      if (x.size != 0) {
+        return -1;
+      }
     }
 
-    return true;
+
+    DocumentReference conRef = await FirebaseFirestore.instance
+        .collection('Conversations')
+        .add({'name': name, 'people': userIDs});
+
+    for (var i = 0; i < userIDs.length; i++) {
+      DocumentReference userRef =
+          FirebaseFirestore.instance.collection('Users').doc(userIDs[i]);
+      userRef.update({
+        'conversations': FieldValue.arrayUnion([conRef.id])
+      });
+
+    }
+
+    return 1;
   } catch (e) {
     print(e);
-    return false;
+    return 0;
   }
 }

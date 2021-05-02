@@ -30,12 +30,17 @@ class _NewConversationScreenState extends State<NewConversationScreen> {
             icon: Icon(Icons.arrow_forward_ios_rounded),
             onPressed: () async {
               if (selected.length == 1) {
-                bool successful = await createPM(selected[0]);
-                if (successful) {
+                int successful = await createConversation(selected, "");
+                print(successful);
+                if (successful == 1) {
                   Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(
                           builder: (context) => ConversationScreen()));
+                } else if (successful == -1){
+                  // Navigate to Existing Chat screen
+                  // For now Pop lang sa
+                  Navigator.pop(context);
                 }
               } else if (selected.length > 1) {
                 Navigator.push(
