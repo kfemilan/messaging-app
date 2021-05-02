@@ -32,10 +32,17 @@ class _NewConversationScreenState extends State<NewConversationScreen> {
               if (selected.length == 1) {
                 bool successful = await createPM(selected[0]);
                 if (successful) {
-                  Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => ConversationScreen()));
-                } 
+                  Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => ConversationScreen()));
+                }
               } else if (selected.length > 1) {
-                Navigator.push(context, MaterialPageRoute(builder: (context) => ConfirmCreateScreen(selected: selected)));
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) =>
+                            ConfirmCreateScreen(selected: selected))).then((value) => setState((){}));
               }
             },
           )
@@ -113,29 +120,22 @@ class _NewConversationScreenState extends State<NewConversationScreen> {
                                             MainAxisAlignment.center,
                                         children: [
                                           Stack(
+                                            alignment: Alignment.topRight,
                                             children: [
-                                              CircleAvatar(radius: 30),
-                                              // IconButton(
-                                              //   icon: Icon(
-                                              //     Icons.close,
-                                              //     color: Theme.of(context)
-                                              //         .primaryColorLight,
-                                              //   ),
-                                              //   onPressed: () {
-                                              //     setState(() {
-                                              //       selected.removeWhere(
-                                              //           (element) =>
-                                              //               element.id ==
-                                              //               selected[i].id);
-                                              //     });
-                                              //   },
-                                              // ),
+                                              CircleAvatar(
+                                                radius: MediaQuery.of(context)
+                                                        .size
+                                                        .width *
+                                                    0.07,
+                                                child: Text(selected[i].name[0].toUpperCase()),
+                                              ),
                                               Container(
-                                                alignment: Alignment.topRight,
-                                                width: 30,
+                                                width: 20,
+                                                height: 20,
                                                 child: FloatingActionButton(
-                                                  heroTag: selected[i].id,
-                                                    child: Icon(Icons.close),
+                                                  backgroundColor: Theme.of(context).primaryColorLight,
+                                                    heroTag: selected[i].id,
+                                                    child: Icon(Icons.close, size: 15, color: Theme.of(context).accentColor),
                                                     onPressed: () {
                                                       setState(() {
                                                         selected.removeWhere(
@@ -185,8 +185,7 @@ class _NewConversationScreenState extends State<NewConversationScreen> {
                                   }
                                   return ListTile(
                                     leading: CircleAvatar(
-                                      backgroundColor:
-                                          Theme.of(context).primaryColor,
+                                      child: Text(document['name'][0].toString().toUpperCase())
                                     ),
                                     title: Text(document['name']),
                                     onTap: () {
