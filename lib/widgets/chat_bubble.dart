@@ -5,7 +5,7 @@ class ChatBubble extends StatelessWidget {
   final List<Message> messages;
   final index, color;
 
-  const ChatBubble({this.messages, this.index, this.color = Colors.black});
+  const ChatBubble({this.messages, this.index, this.color});
 
   @override
   Widget build(BuildContext context) {
