@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:messaging_app/database/flutterfire.dart';
 import 'package:messaging_app/models/Constants.dart';
-import 'package:messaging_app/widgets/curve_painter.dart';
 
 import 'home_screen.dart';
 
