@@ -5,6 +5,7 @@ import 'package:messaging_app/models/Conversation.dart';
 import 'package:messaging_app/widgets/conversation_tile.dart';
 
 import 'landing_screen.dart';
+import 'new_conversation.dart';
 
 class HomeScreen extends StatefulWidget {
   HomeScreen({Key key}) : super(key: key);
@@ -41,6 +42,7 @@ class _HomeScreenState extends State<HomeScreen> {
             icon: Icon(Icons.edit, color: Theme.of(context).primaryColorLight),
             onPressed: () {
               // Create New Conversation
+              Navigator.push(context, MaterialPageRoute(builder: (context) => NewConversationScreen()));
             },
           ),
         ],
