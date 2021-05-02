@@ -17,6 +17,7 @@ class _LoginScreenState extends State<LoginScreen> {
   TextEditingController _password = new TextEditingController();
   final _formKey = GlobalKey<FormState>();
   bool hidePass = true;
+  Color buttonColor = primaryLight;
 
   @override
   Widget build(BuildContext context) {
@@ -85,6 +86,8 @@ class _LoginScreenState extends State<LoginScreen> {
                           style: Theme.of(context).textTheme.headline6),
                       Spacer(),
                       TextFormField(
+                        keyboardType: TextInputType.emailAddress,
+                        textInputAction: TextInputAction.next,
                         controller: _email,
                         style: Theme.of(context).textTheme.bodyText2,
                         decoration: InputDecoration(
@@ -109,18 +112,34 @@ class _LoginScreenState extends State<LoginScreen> {
                       Spacer(),
                       TextFormField(
                         controller: _password,
-                        obscureText: true,
+                        obscureText: hidePass,
                         style: Theme.of(context).textTheme.bodyText2,
                         decoration: InputDecoration(
                           filled: true,
                           fillColor: Theme.of(context).primaryColorDark,
+                          suffixIcon: IconButton(
+                            icon: Icon(Icons.visibility),
+                            color: buttonColor,
+                            onPressed: () {
+                              setState(() {
+                                buttonColor = (buttonColor ==
+                                        Theme.of(context).accentColor)
+                                    ? Theme.of(context).primaryColorLight
+                                    : Theme.of(context).accentColor;
+                                hidePass = !hidePass;
+                                print(hidePass);
+                              });
+                            },
+                          ),
                           border: OutlineInputBorder(
                             borderSide: BorderSide.none,
                             borderRadius: BorderRadius.circular(15.0),
                           ),
                           focusedBorder: OutlineInputBorder(
                             borderSide: BorderSide(
-                                width: 1, color: Theme.of(context).accentColor),
+                              width: 1,
+                              color: Theme.of(context).accentColor,
+                            ),
                             borderRadius: BorderRadius.circular(15.0),
                           ),
                         ),
