@@ -65,21 +65,22 @@ class _ConversationScreenState extends State<ConversationScreen> {
                       mainAxisAlignment: _messages[index].senderId == 00
                           ? MainAxisAlignment.end
                           : MainAxisAlignment.start,
-                      children: _messages[index].senderId == 00
-                          ? [
-                              ChatBubble(messages: _messages, index: index),
-                            ]
-                          : [
-                              Image(
-                                  width: 35,
-                                  height: 35,
-                                  image: NetworkImage(kDefaultProfilePicture)),
-                              SizedBox(width: 10.0),
-                              ChatBubble(
-                                  messages: _messages,
-                                  index: index,
-                                  color: Colors.white),
-                            ],
+                      children: [
+                        if (_messages[index].senderId != 00)
+                          Image(
+                              width: 35,
+                              height: 35,
+                              image: NetworkImage(kDefaultProfilePicture)),
+                        Padding(
+                          padding: const EdgeInsets.only(left: 10.0),
+                          child: ChatBubble(
+                              messages: _messages,
+                              index: index,
+                              color: _messages[index].senderId != 00
+                                  ? Colors.white
+                                  : Colors.black),
+                        ),
+                      ],
                     );
                   }),
             )),
