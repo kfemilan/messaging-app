@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:messaging_app/models/Constants.dart';
 import 'package:messaging_app/models/Message.dart';
+import 'package:messaging_app/widgets/chat_bubble.dart';
 
 class ConversationScreen extends StatefulWidget {
   @override
@@ -66,26 +67,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
                           : MainAxisAlignment.start,
                       children: _messages[index].senderId == 00
                           ? [
-                              Container(
-                                  padding: EdgeInsets.all(10.0),
-                                  decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.only(
-                                        topLeft: Radius.circular(12),
-                                        topRight: Radius.circular(12),
-                                        bottomLeft: Radius.circular(
-                                            _messages[index].senderId == 00
-                                                ? 12
-                                                : 0),
-                                        bottomRight: Radius.circular(
-                                            _messages[index].senderId == 00
-                                                ? 0
-                                                : 12),
-                                      ),
-                                      color: _messages[index].senderId != 00
-                                          ? Theme.of(context).primaryColorLight
-                                          : Colors.white),
-                                  child: Text(_messages[index].message,
-                                      style: TextStyle(color: Colors.black))),
+                              ChatBubble(messages: _messages, index: index),
                             ]
                           : [
                               Image(
@@ -93,26 +75,10 @@ class _ConversationScreenState extends State<ConversationScreen> {
                                   height: 35,
                                   image: NetworkImage(kDefaultProfilePicture)),
                               SizedBox(width: 10.0),
-                              Container(
-                                  padding: EdgeInsets.all(10.0),
-                                  decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.only(
-                                        topLeft: Radius.circular(12),
-                                        topRight: Radius.circular(12),
-                                        bottomLeft: Radius.circular(
-                                            _messages[index].senderId == 00
-                                                ? 12
-                                                : 0),
-                                        bottomRight: Radius.circular(
-                                            _messages[index].senderId == 00
-                                                ? 0
-                                                : 12),
-                                      ),
-                                      color: _messages[index].senderId != 00
-                                          ? Theme.of(context).primaryColorLight
-                                          : Colors.white),
-                                  child: Text(_messages[index].message,
-                                      style: TextStyle(color: Colors.black))),
+                              ChatBubble(
+                                  messages: _messages,
+                                  index: index,
+                                  color: Colors.white),
                             ],
                     );
                   }),
@@ -130,7 +96,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
                 Expanded(
                   child: TextField(
                       decoration:
-                          InputDecoration(labelText: "Enter your message...")),
+                          InputDecoration(hintText: "Enter your message...")),
                 ),
                 IconButton(icon: Icon(Icons.send), onPressed: () {}),
               ],
