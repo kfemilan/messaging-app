@@ -8,18 +8,19 @@ import 'package:messaging_app/models/Message.dart';
 import 'package:messaging_app/screens/conversation_screen.dart';
 import 'package:messaging_app/database/flutterfire.dart';
 
-import 'dart:math'; // for RNG, 2 remove later
-
 class ConversationTile extends StatefulWidget {
-  const ConversationTile(this.conversationId, this.name, this.people, this.message, {Key key}) : super(key: key);
+  const ConversationTile(this.conversationId, this.name, this.people, {Key key}) : super(key: key);
   final people;
   final String name, conversationId;
-  final Message message;
   @override
   _ConversationTileState createState() => _ConversationTileState();
 }
 
 class _ConversationTileState extends State<ConversationTile> {
+  String sender = ""; // To get name of userId
+  Message latestMessage = Message(message: "Error retrieving Message", timeSent: DateTime.now(), senderId: "Error");
+  String time = "Time"; // Just in case of error
+
   Future<String> _getDMName() async {
     if (widget.name != "") return widget.name;
     try {
@@ -32,27 +33,64 @@ class _ConversationTileState extends State<ConversationTile> {
     }
   }
 
+  Future<Message> _getLatestMessage() async {
+    try {
+      QuerySnapshot messages = await FirebaseFirestore.instance
+          .collection('Conversations')
+          .doc('${widget.conversationId}')
+          .collection('Messages')
+          .orderBy('timeSent', descending: true)
+          .get();
+      if (messages.size == 0) {
+        // If no messages yet
+        var date =
+            (await FirebaseFirestore.instance.collection('Conversations').doc('${widget.conversationId}').get()).data()['latestMessageTime'].toDate();
+        return Message(
+          message: "Start a conversation!",
+          senderId: "",
+          timeSent: date,
+        );
+      }
+      Map<String, dynamic> retrievedMessage = messages.docs.elementAt(0).data();
+      return Message(
+        message: retrievedMessage['message'],
+        senderId: await getName(retrievedMessage['senderID']),
+        timeSent: retrievedMessage['timeSent'].toDate(),
+      );
+    } on Exception catch (e) {
+      print(e.toString());
+      return Message(message: "Error retrieving Message", timeSent: DateTime.now(), senderId: "Error");
+    }
+  }
+
+  Future<List<dynamic>> _retrieveData() async {
+    try {
+      String dmName = await _getDMName(); // Name of Convo is at index 0
+      Message message = await _getLatestMessage(); // Message is at index 1
+      return [dmName, message];
+    } on Exception catch (e) {
+      print(e.toString());
+    }
+    return ["", Message(message: "Error retrieving Message", timeSent: DateTime.now(), senderId: "Error")];
+  }
+
   @override
   Widget build(BuildContext context) {
-    String sender = ""; // To get name of userId
-    String time = "Time"; // Just in case of error
-    DateTime messageDay = widget.message.timeSent, today = DateTime.now(), lastWeek = DateTime.now().subtract(Duration(days: 7));
-
-    if (today.day == messageDay.day && today.month == messageDay.month && today.year == messageDay.year)
-      time = DateFormat.jm().format(widget.message.timeSent); // Same day, just time
-    else if (messageDay.compareTo(lastWeek) >= 0)
-      time = DateFormat.E().format(widget.message.timeSent); // WeekdayAbbr e.g. Fri
-    else
-      time = DateFormat.MMMd().format(widget.message.timeSent); // MonthAbbr Date e.g. Mar 1
-
-    // to remove later
-    var rng = Random();
-    sender = ["Matthew", "Mark", "Luke", "John", "Acts"][rng.nextInt(5)];
-
+    DateTime messageDay = latestMessage.timeSent, today = DateTime.now(), lastWeek = DateTime.now().subtract(Duration(days: 7));
     return FutureBuilder(
-      future: _getDMName(),
+      future: _retrieveData(),
       builder: (context, snapshot) {
         if (!snapshot.hasData) return SizedBox(height: 0, width: 0);
+        // Once latest message is retrieved
+        latestMessage = snapshot.data[1];
+
+        if (today.day == messageDay.day && today.month == messageDay.month && today.year == messageDay.year)
+          time = DateFormat.jm().format(latestMessage.timeSent); // Same day, just time
+        else if (messageDay.compareTo(lastWeek) >= 0)
+          time = DateFormat.E().format(latestMessage.timeSent); // WeekdayAbbr e.g. Fri
+        else
+          time = DateFormat.MMMd().format(latestMessage.timeSent); // MonthAbbr Date e.g. Mar 1
+
         return Dismissible(
           key: Key(widget.conversationId.toString()),
           background: Container(
@@ -86,7 +124,7 @@ class _ConversationTileState extends State<ConversationTile> {
             onTap: () => Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (context) => ConversationScreen(conversationID: widget.conversationId, name: snapshot.data, people: widget.people))),
+                    builder: (context) => ConversationScreen(conversationID: widget.conversationId, name: snapshot.data[0], people: widget.people))),
             child: Container(
               height: 75.0,
               width: MediaQuery.of(context).size.width,
@@ -113,7 +151,7 @@ class _ConversationTileState extends State<ConversationTile> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          "${snapshot.data}",
+                          "${snapshot.data[0]}",
                           style: TextStyle(color: Colors.black, fontWeight: FontWeight.w700, fontSize: 16.0),
                         ),
                         Row(
@@ -121,7 +159,7 @@ class _ConversationTileState extends State<ConversationTile> {
                           children: [
                             Expanded(
                               child: Text(
-                                "$sender: ${this.widget.message.message}",
+                                latestMessage.senderId + (latestMessage.senderId == "" ? "" : ": ") + latestMessage.message,
                                 overflow: TextOverflow.ellipsis,
                                 style: TextStyle(color: Colors.grey),
                               ),

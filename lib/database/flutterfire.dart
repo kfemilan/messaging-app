@@ -63,7 +63,11 @@ Future<int> createConversation(List<Account> users, String name) async {
       return -1;
     }
 
-    DocumentReference conRef = await FirebaseFirestore.instance.collection('Conversations').add({'name': name, 'people': userIDs});
+    DocumentReference conRef = await FirebaseFirestore.instance.collection('Conversations').add({
+      'name': name,
+      'people': userIDs,
+      'latestMessageTime': DateTime.now(),
+    });
 
     for (var i = 0; i < userIDs.length; i++) {
       DocumentReference userRef = FirebaseFirestore.instance.collection('Users').doc(userIDs[i]);
@@ -86,7 +90,7 @@ Future<String> getName(String userId) async {
     return name;
   } on Exception catch (e) {
     print(e);
-    return "Error Retrieving Name";
+    return "";
   }
 }
 
