@@ -31,22 +31,16 @@ class _NewConversationScreenState extends State<NewConversationScreen> {
             icon: Icon(Icons.arrow_forward_ios_rounded),
             onPressed: () async {
               if (selected.length == 1) {
-                int successful = await createConversation(selected, "");
-                print(successful);
-                if (successful == 1) {
+                String output = await createConversation(selected, "");
+                if (output == "Error") {
+                  print("Error creating conversation!");
+                } else {
+                  final user2 = await getName(userID2);
                   Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(
                           builder: (context) => ConversationScreen(
-                                  name: name,
-                                  people: [
-                                    userID2,
-                                    FirebaseAuth.instance.currentUser.uid
-                                  ])));
-                } else if (successful == -1) {
-                  // Navigate to Existing Chat screen
-                  // For now Pop lang sa
-                  Navigator.pop(context);
+                              conversationID: output, name: user2)));
                 }
               } else if (selected.length > 1) {
                 Navigator.push(
@@ -130,7 +124,9 @@ class _NewConversationScreenState extends State<NewConversationScreen> {
                                       padding: EdgeInsets.all(5),
                                       width: MediaQuery.of(context).size.width *
                                           0.2,
-                                      height: MediaQuery.of(context).size.height * 0.1,
+                                      height:
+                                          MediaQuery.of(context).size.height *
+                                              0.1,
                                       child: Column(
                                         mainAxisAlignment:
                                             MainAxisAlignment.center,
@@ -182,7 +178,8 @@ class _NewConversationScreenState extends State<NewConversationScreen> {
                           decoration: BoxDecoration(
                               border: Border(
                                   bottom: BorderSide(
-                                      color: Theme.of(context).primaryColorLight,
+                                      color:
+                                          Theme.of(context).primaryColorLight,
                                       width: 2))),
                         ),
                         Expanded(
@@ -218,7 +215,8 @@ class _NewConversationScreenState extends State<NewConversationScreen> {
                                               color: Theme.of(context)
                                                   .primaryColorDark)),
                                       selected: (selected.firstWhere(
-                                                  (sel) => sel.id == document.id,
+                                                  (sel) =>
+                                                      sel.id == document.id,
                                                   orElse: () => null) ==
                                               null)
                                           ? false
@@ -226,6 +224,7 @@ class _NewConversationScreenState extends State<NewConversationScreen> {
                                       selectedTileColor:
                                           Theme.of(context).primaryColorLight,
                                       onTap: () {
+                                        userID2 = document.id;
                                         Account temp = new Account(
                                             id: document.id,
                                             name: document['name'],
@@ -235,8 +234,9 @@ class _NewConversationScreenState extends State<NewConversationScreen> {
                                         if (contain.isEmpty) {
                                           addToSelected(temp);
                                         } else {
-                                          var i = selected.indexWhere((element) =>
-                                              element.id == document.id);
+                                          var i = selected.indexWhere(
+                                              (element) =>
+                                                  element.id == document.id);
                                           removeFromSelected(i);
                                         }
                                       },
@@ -273,18 +273,23 @@ class _NewConversationScreenState extends State<NewConversationScreen> {
 
   showErrorDialog() {
     return showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('No User Selected!', style: Theme.of(context).textTheme.headline3),
-          content: Text('Please select a user to start a conversation.'),
-          actions: [
-            TextButton(child: Text('Ok'), onPressed: (){Navigator.pop(context);},)
-          ],
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(15))),
-        );
-      }
-    );
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('No User Selected!',
+                style: Theme.of(context).textTheme.headline3),
+            content: Text('Please select a user to start a conversation.'),
+            actions: [
+              TextButton(
+                child: Text('Ok'),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              )
+            ],
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(15))),
+          );
+        });
   }
-
 }

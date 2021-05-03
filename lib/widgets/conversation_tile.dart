@@ -9,8 +9,8 @@ import 'package:messaging_app/database/flutterfire.dart';
 import 'package:messaging_app/widgets/alert_dialogs.dart';
 
 class ConversationTile extends StatefulWidget {
-  const ConversationTile(this.conversationId, this.name, this.people, {Key key}) : super(key: key);
-  final people;
+  const ConversationTile(this.conversationId, this.name, {Key key})
+      : super(key: key);
   final String name, conversationId;
   @override
   _ConversationTileState createState() => _ConversationTileState();
@@ -18,16 +18,24 @@ class ConversationTile extends StatefulWidget {
 
 class _ConversationTileState extends State<ConversationTile> {
   String sender = ""; // To get name of userId
-  Message latestMessage = Message(message: "Error retrieving Message", timeSent: DateTime.now(), senderId: "Error");
+  Message latestMessage = Message(
+      message: "Error retrieving Message",
+      timeSent: DateTime.now(),
+      senderId: "Error");
   String time = "Time"; // Just in case of error
   bool isSeen = false;
 
   Future<String> _getDMName() async {
     if (widget.name != "") return widget.name;
     try {
-      DocumentSnapshot convoSnapshot = await FirebaseFirestore.instance.collection('Conversations').doc(widget.conversationId).get();
+      DocumentSnapshot convoSnapshot = await FirebaseFirestore.instance
+          .collection('Conversations')
+          .doc(widget.conversationId)
+          .get();
       List<dynamic> userIds = convoSnapshot.data()['people'];
-      return (userIds[0] == FirebaseAuth.instance.currentUser.uid ? await getName(userIds[1]) : await getName(userIds[0]));
+      return (userIds[0] == FirebaseAuth.instance.currentUser.uid
+          ? await getName(userIds[1])
+          : await getName(userIds[0]));
     } on Exception catch (e) {
       print(e.toString());
       return "Error getting name";
@@ -44,8 +52,12 @@ class _ConversationTileState extends State<ConversationTile> {
           .get();
       if (messages.size == 0) {
         // If no messages yet
-        var date =
-            (await FirebaseFirestore.instance.collection('Conversations').doc('${widget.conversationId}').get()).data()['latestMessageTime'].toDate();
+        var date = (await FirebaseFirestore.instance
+                .collection('Conversations')
+                .doc('${widget.conversationId}')
+                .get())
+            .data()['latestMessageTime']
+            .toDate();
         return Message(
           message: "Start a conversation!",
           senderId: "",
@@ -60,7 +72,10 @@ class _ConversationTileState extends State<ConversationTile> {
       );
     } on Exception catch (e) {
       print(e.toString());
-      return Message(message: "Error retrieving Message", timeSent: DateTime.now(), senderId: "Error");
+      return Message(
+          message: "Error retrieving Message",
+          timeSent: DateTime.now(),
+          senderId: "Error");
     }
   }
 
@@ -92,7 +107,9 @@ class _ConversationTileState extends State<ConversationTile> {
 
   @override
   Widget build(BuildContext context) {
-    DateTime messageDay = latestMessage.timeSent, today = DateTime.now(), lastWeek = DateTime.now().subtract(Duration(days: 7));
+    DateTime messageDay = latestMessage.timeSent,
+        today = DateTime.now(),
+        lastWeek = DateTime.now().subtract(Duration(days: 7));
     return FutureBuilder(
       future: _retrieveData(),
       builder: (context, snapshot) {
@@ -103,24 +120,32 @@ class _ConversationTileState extends State<ConversationTile> {
         // Once latest message is retrieved
         latestMessage = snapshot.data[1];
         isSeen = snapshot.data[2];
-        if (today.day == messageDay.day && today.month == messageDay.month && today.year == messageDay.year)
-          time = DateFormat.jm().format(latestMessage.timeSent); // Same day, just time
+
+        if (today.day == messageDay.day &&
+            today.month == messageDay.month &&
+            today.year == messageDay.year)
+          time = DateFormat.jm()
+              .format(latestMessage.timeSent); // Same day, just
         else if (messageDay.compareTo(lastWeek) >= 0)
-          time = DateFormat.E().format(latestMessage.timeSent); // WeekdayAbbr e.g. Fri
+          time = DateFormat.E()
+              .format(latestMessage.timeSent); // WeekdayAbbr e.g. Fri
         else
-          time = DateFormat.MMMd().format(latestMessage.timeSent); // MonthAbbr Date e.g. Mar 1
+          time = DateFormat.MMMd()
+              .format(latestMessage.timeSent); // MonthAbbr Date e.g. Mar 1
 
         return Dismissible(
           key: Key(widget.conversationId.toString()),
           background: Container(
             alignment: Alignment.centerLeft,
             margin: EdgeInsets.only(left: 20.0),
-            child: Icon(Icons.more, color: Theme.of(context).primaryColorLight, size: 30),
+            child: Icon(Icons.more,
+                color: Theme.of(context).primaryColorLight, size: 30),
           ),
           secondaryBackground: Container(
             alignment: Alignment.centerRight,
             margin: EdgeInsets.only(right: 20.0),
-            child: Icon(Icons.delete, color: Theme.of(context).primaryColorLight, size: 30),
+            child: Icon(Icons.delete,
+                color: Theme.of(context).primaryColorLight, size: 30),
           ),
           confirmDismiss: (direction) async {
             bool dismiss = false;
@@ -128,16 +153,23 @@ class _ConversationTileState extends State<ConversationTile> {
               // Delete
               dismiss = await showDialog<bool>(
                 context: context,
-                builder: (BuildContext context) => DeleteConversationAlertDialog(),
+                builder: (BuildContext context) =>
+                    DeleteConversationAlertDialog(),
               );
               bool delSuccess = false;
-              if (dismiss) delSuccess = await leaveConversation(widget.conversationId);
-              if (delSuccess) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Left conversation.')));
+              if (dismiss)
+                delSuccess = await leaveConversation(widget.conversationId);
+              if (delSuccess)
+                ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Left conversation.')));
             } else {
-              // Edit
-              bool editSuccess = await showDialog<bool>(
-                  context: context, builder: (BuildContext context) => EditConversationAlertDialog(snapshot.data[0], widget.conversationId));
-              if (editSuccess) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Successfully edited conversation.')));
+              // More
+              print("More");
+              bool edit = await showDialog<bool>(
+                  context: context,
+                  builder: (BuildContext context) =>
+                      EditConversationAlertDialog(
+                          snapshot.data[0], widget.conversationId));
             }
             return dismiss;
           },
@@ -147,10 +179,9 @@ class _ConversationTileState extends State<ConversationTile> {
               return Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => ConversationScreen(conversationID: widget.conversationId, name: snapshot.data[0], people: widget.people),
-                ),
-              );
-            },
+                    builder: (context) => ConversationScreen(
+                        conversationID: widget.conversationId,
+                        name: snapshot.data[0]))),
             child: Container(
               height: 75.0,
               width: MediaQuery.of(context).size.width,
@@ -178,19 +209,25 @@ class _ConversationTileState extends State<ConversationTile> {
                       children: [
                         Text(
                           "${snapshot.data[0]}", // Convo Name
-                          style: TextStyle(color: Colors.black, fontWeight: FontWeight.w700, fontSize: 16.0),
+                          style: TextStyle(
+                              color: Colors.black,
+                              fontWeight: FontWeight.w700,
+                              fontSize: 16.0),
                         ),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Expanded(
                               child: Text(
-                                latestMessage.senderId + (latestMessage.senderId == "" ? "" : ": ") + latestMessage.message,
+                                latestMessage.senderId +
+                                    (latestMessage.senderId == "" ? "" : ": ") +
+                                    latestMessage.message,
                                 overflow: TextOverflow.ellipsis,
                                 style: TextStyle(color: isSeen ? Colors.grey : Theme.of(context).primaryColorLight),
                               ),
                             ),
-                            Text("$time", style: TextStyle(color: Colors.black)),
+                            Text("$time",
+                                style: TextStyle(color: Colors.black)),
                           ],
                         ),
                       ],

@@ -4,7 +4,8 @@ import 'package:messaging_app/models/Account.dart';
 
 Future<bool> signIn(String email, String password) async {
   try {
-    await FirebaseAuth.instance.signInWithEmailAndPassword(email: email, password: password);
+    await FirebaseAuth.instance
+        .signInWithEmailAndPassword(email: email, password: password);
     return true;
   } catch (e) {
     print(e);
@@ -14,10 +15,12 @@ Future<bool> signIn(String email, String password) async {
 
 Future<bool> register(String email, String password, String name) async {
   try {
-    await FirebaseAuth.instance.createUserWithEmailAndPassword(email: email, password: password);
+    await FirebaseAuth.instance
+        .createUserWithEmailAndPassword(email: email, password: password);
 
     String uID = FirebaseAuth.instance.currentUser.uid;
-    DocumentReference docRef = FirebaseFirestore.instance.collection('Users').doc(uID);
+    DocumentReference docRef =
+        FirebaseFirestore.instance.collection('Users').doc(uID);
     docRef.set({
       'name': name,
       'email': email,
@@ -49,7 +52,7 @@ Future<bool> signOut() async {
   }
 }
 
-Future<int> createConversation(List<Account> users, String name) async {
+Future<String> createConversation(List<Account> users, String name) async {
   try {
     // Get uID of current user
     var uID = FirebaseAuth.instance.currentUser.uid;
@@ -57,36 +60,34 @@ Future<int> createConversation(List<Account> users, String name) async {
     userIDs.add(uID);
     userIDs.sort();
 
-    QuerySnapshot x = await FirebaseFirestore.instance.collection("Conversations").where("people", isEqualTo: userIDs).get();
+    QuerySnapshot x = await FirebaseFirestore.instance
+        .collection("Conversations")
+        .where("people", isEqualTo: userIDs)
+        .get();
     print(x.size);
     if (x.size != 0) {
-      return -1;
+      return x.docs[0].id;
     }
 
-    DocumentReference conRef = await FirebaseFirestore.instance.collection('Conversations').add({
+    DocumentReference conRef =
+        await FirebaseFirestore.instance.collection('Conversations').add({
       'name': name,
       'people': userIDs,
       'latestMessageTime': DateTime.now(),
       'lastSeen': {FirebaseAuth.instance.currentUser.uid: DateTime.now()},
     });
 
-    for (var i = 0; i < userIDs.length; i++) {
-      DocumentReference userRef = FirebaseFirestore.instance.collection('Users').doc(userIDs[i]);
-      userRef.update({
-        'conversations': FieldValue.arrayUnion([conRef.id])
-      });
-    }
-
-    return 1;
+    return conRef.id;
   } catch (e) {
     print(e);
-    return 0;
+    return "Error";
   }
 }
 
 Future<String> getName(String userId) async {
   try {
-    DocumentSnapshot userSnapshot = await FirebaseFirestore.instance.collection('Users').doc(userId).get();
+    DocumentSnapshot userSnapshot =
+        await FirebaseFirestore.instance.collection('Users').doc(userId).get();
     String name = userSnapshot.data()['name'] as String;
     return name;
   } on Exception catch (e) {
@@ -98,16 +99,25 @@ Future<String> getName(String userId) async {
 Future<bool> leaveConversation(String conversationId) async {
   try {
     // await FirebaseFirestore.instance.collection('Conversations').doc(conversationId).delete();
-    DocumentSnapshot convoSnapshot = await FirebaseFirestore.instance.collection('Conversations').doc(conversationId).get();
+    DocumentSnapshot convoSnapshot = await FirebaseFirestore.instance
+        .collection('Conversations')
+        .doc(conversationId)
+        .get();
     List<dynamic> people = convoSnapshot.data()['people'];
 
     if (people.length <= 2) // If only two people are in the convo
-      await FirebaseFirestore.instance.collection('Conversations').doc(conversationId).delete();
+      await FirebaseFirestore.instance
+          .collection('Conversations')
+          .doc(conversationId)
+          .delete();
     else {
       // If Group chat
-      DocumentReference convoRef = FirebaseFirestore.instance.collection('Conversations').doc(conversationId);
+      DocumentReference convoRef = FirebaseFirestore.instance
+          .collection('Conversations')
+          .doc(conversationId);
       convoRef.update({
-        'people': FieldValue.arrayRemove([FirebaseAuth.instance.currentUser.uid])
+        'people':
+            FieldValue.arrayRemove([FirebaseAuth.instance.currentUser.uid])
       });
     }
     return true;
