@@ -32,13 +32,10 @@ class _NewConversationScreenState extends State<NewConversationScreen> {
             onPressed: () async {
               if (selected.length == 1) {
                 String output = await createConversation(selected, "");
-                print("GG");
                 if (output == "Error") {
                   print("Error creating conversation!");
                 } else {
                   final user2 = await getName(userID2);
-                  print("GGGGGGGG");
-                  print(user2);
                   Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(
