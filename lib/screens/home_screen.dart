@@ -26,12 +26,10 @@ class _HomeScreenState extends State<HomeScreen> {
         leading: Container(
           alignment: Alignment.center,
           child: IconButton(
-            icon:
-                Icon(Icons.person, color: Theme.of(context).primaryColorLight),
+            icon: Icon(Icons.person, color: Theme.of(context).primaryColorLight),
             onPressed: () {
               signOut();
-              Navigator.pushReplacement(context,
-                  MaterialPageRoute(builder: (context) => LandingScreen()));
+              Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => LandingScreen()));
             },
           ),
         ),
@@ -40,10 +38,7 @@ class _HomeScreenState extends State<HomeScreen> {
             icon: Icon(Icons.edit, color: Theme.of(context).primaryColorLight),
             onPressed: () {
               // Create New Conversation
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => NewConversationScreen()));
+              Navigator.push(context, MaterialPageRoute(builder: (context) => NewConversationScreen()));
             },
           ),
         ],
@@ -52,14 +47,9 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             Text(
               "sent",
-              style: TextStyle(
-                  fontFamily: "Barlow",
-                  color: Theme.of(context).primaryColorLight),
+              style: TextStyle(fontFamily: "Barlow", color: Theme.of(context).primaryColorLight),
             ),
-            Text("ence",
-                style: TextStyle(
-                    fontFamily: "Barlow",
-                    color: Theme.of(context).primaryColorDark)),
+            Text("ence", style: TextStyle(fontFamily: "Barlow", color: Theme.of(context).primaryColorDark)),
           ],
         ),
       ),
@@ -69,9 +59,7 @@ class _HomeScreenState extends State<HomeScreen> {
           Container(
             height: 50.0,
             margin: EdgeInsets.symmetric(vertical: 4.0),
-            padding: EdgeInsets.symmetric(
-                vertical: 2.0,
-                horizontal: MediaQuery.of(context).size.width * 0.08),
+            padding: EdgeInsets.symmetric(vertical: 2.0, horizontal: MediaQuery.of(context).size.width * 0.08),
             alignment: Alignment.center,
             child: Container(
               decoration: BoxDecoration(
@@ -91,10 +79,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 decoration: InputDecoration(
                   border: InputBorder.none,
                   hintText: "Search Conversation",
-                  hintStyle:
-                      TextStyle(color: Theme.of(context).primaryColorLight),
-                  prefixIcon: Icon(Icons.search,
-                      color: Theme.of(context).primaryColorLight),
+                  hintStyle: TextStyle(color: Theme.of(context).primaryColorLight),
+                  prefixIcon: Icon(Icons.search, color: Theme.of(context).primaryColorLight),
                   // icon: Icon(Icons.search, color: Theme.of(context).primaryColorLight),
                 ),
               ),
@@ -105,22 +91,18 @@ class _HomeScreenState extends State<HomeScreen> {
             child: StreamBuilder(
               stream: FirebaseFirestore.instance
                   .collection("Conversations")
-                  .where("people",
-                      arrayContains: FirebaseAuth.instance.currentUser.uid)
+                  .where("people", arrayContains: FirebaseAuth.instance.currentUser.uid)
                   .snapshots(),
-              builder: (BuildContext context,
-                  AsyncSnapshot<QuerySnapshot> snapshot) {
+              builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
                 print(FirebaseAuth.instance.currentUser.uid);
                 // if (!snapshot.hasData) return Center(child: CircularProgressIndicator());
-                if (snapshot.connectionState == ConnectionState.waiting)
-                  return SizedBox(height: 0, width: 0);
+                if (snapshot.connectionState == ConnectionState.waiting) return SizedBox(height: 0, width: 0);
                 List mappedDocs = snapshot.data.docs
                     .map((docu) => {
                           'convoId': docu.id,
                           'name': docu.data()['name'],
                           'people': docu.data()['people'],
-                          'latestMessageTime':
-                              docu.data()['latestMessageTime'].toDate(),
+                          'latestMessageTime': docu.data()['latestMessageTime'].toDate(),
                         })
                     .toList();
                 mappedDocs.sort((b, a) => a['latestMessageTime'].compareTo(b['latestMessageTime']));
@@ -128,7 +110,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     itemCount: mappedDocs.length,
                     itemBuilder: (BuildContext context, index) {
                       return mappedDocs[index]['name'].toLowerCase().contains(_searchConvo.value.text.toLowerCase())
-                          ? ConversationTile(mappedDocs[index]['convoId'], mappedDocs[index]['name'], mappedDocs[index]['people'])
+                          ? ConversationTile(mappedDocs[index]['convoId'], mappedDocs[index]['name'])
                           : SizedBox(width: 0, height: 0);
                     });
               },
@@ -144,8 +126,7 @@ class _HomeScreenState extends State<HomeScreen> {
         currentIndex: bottomNavIndex,
         onTap: (value) => setState(() => bottomNavIndex = value),
         items: [
-          BottomNavigationBarItem(
-              label: "Conversations", icon: Icon(Icons.chat_bubble)),
+          BottomNavigationBarItem(label: "Conversations", icon: Icon(Icons.chat_bubble)),
           BottomNavigationBarItem(label: "Friends", icon: Icon(Icons.group)),
         ],
       ),
