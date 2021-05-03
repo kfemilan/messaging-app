@@ -156,8 +156,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
                                   padding: const EdgeInsets.only(
                                       left: 10.0, bottom: 5.0),
                                   child: ChatBubble(
-                                      messages: _messages,
-                                      index: index,
+                                      message: _messages[index],
                                       color: _messages[index].senderId != userID
                                           ? Colors.white
                                           : Colors.black),
