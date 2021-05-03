@@ -3,8 +3,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import 'package:messaging_app/database/flutterfire.dart';
-import 'package:messaging_app/models/Constants.dart';
-import 'package:messaging_app/models/Conversation.dart';
 import 'package:messaging_app/screens/landing_screen.dart';
 import 'package:messaging_app/screens/new_conversation.dart';
 import 'package:messaging_app/widgets/conversation_tile.dart';
@@ -18,8 +16,6 @@ class HomeScreen extends StatefulWidget {
 // The screen where you can see all the conversations
 class _HomeScreenState extends State<HomeScreen> {
   TextEditingController _searchConvo = new TextEditingController();
-
-  List<Conversation> conversations = dummyConversations;
   int bottomNavIndex = 0;
 
   @override
@@ -29,7 +25,6 @@ class _HomeScreenState extends State<HomeScreen> {
         backgroundColor: Theme.of(context).accentColor,
         leading: Container(
           alignment: Alignment.center,
-          // color: Colors.yellow, // To see boundaries
           child: IconButton(
             icon: Icon(Icons.person, color: Theme.of(context).primaryColorLight),
             onPressed: () {
@@ -72,7 +67,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 borderRadius: BorderRadius.all(Radius.circular(50.0)),
               ),
               alignment: Alignment.center,
-              // padding: EdgeInsets.symmetric(horizontal: 30.0),
               child: TextFormField(
                 onChanged: (currentStr) {
                   setState(() {
@@ -98,16 +92,25 @@ class _HomeScreenState extends State<HomeScreen> {
               stream: FirebaseFirestore.instance
                   .collection("Conversations")
                   .where("people", arrayContains: FirebaseAuth.instance.currentUser.uid)
-                  // .orderBy("latestMessageTime")
                   .snapshots(),
               builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
                 print(FirebaseAuth.instance.currentUser.uid);
-                if (!snapshot.hasData) return Center(child: CircularProgressIndicator());
+                // if (!snapshot.hasData) return Center(child: CircularProgressIndicator());
+                if (snapshot.connectionState == ConnectionState.waiting) return SizedBox(height: 0, width: 0);
+                List mappedDocs = snapshot.data.docs
+                    .map((docu) => {
+                          'convoId': docu.id,
+                          'name': docu.data()['name'],
+                          'people': docu.data()['people'],
+                          'latestMessageTime': docu.data()['latestMessageTime'].toDate(),
+                        })
+                    .toList();
+                mappedDocs.sort((b, a) => a['latestMessageTime'].compareTo(b['latestMessageTime']));
                 return ListView(
-                  children: snapshot.data.docs.map((QueryDocumentSnapshot document) {
-                    print("${document.data()['name']}");
+                  children: mappedDocs.map((dynamic document) {
+                    print("${document['name']}");
                     return document['name'].toLowerCase().contains(_searchConvo.value.text.toLowerCase())
-                        ? ConversationTile(document.id, document.data()['name'], document.data()['people'])
+                        ? ConversationTile(document['convoId'], document['name'], document['people'])
                         : SizedBox(width: 0, height: 0);
                   }).toList(),
                 );
