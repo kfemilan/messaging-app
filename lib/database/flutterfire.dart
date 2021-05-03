@@ -91,3 +91,13 @@ Future<String> getName(String userId) async {
     return "Error Retrieving Name";
   }
 }
+
+Future<bool> deleteConversation(String conversationId) async {
+  try {
+    await FirebaseFirestore.instance.collection('Conversations').doc(conversationId).delete();
+    return true;
+  } on Exception catch (e) {
+    print("Deletion failed! Error: $e");
+  }
+  return false;
+}
