@@ -106,14 +106,13 @@ class _HomeScreenState extends State<HomeScreen> {
                         })
                     .toList();
                 mappedDocs.sort((b, a) => a['latestMessageTime'].compareTo(b['latestMessageTime']));
-                return ListView(
-                  children: mappedDocs.map((dynamic document) {
-                    print("${document['name']}");
-                    return document['name'].toLowerCase().contains(_searchConvo.value.text.toLowerCase())
-                        ? ConversationTile(document['convoId'], document['name'], document['people'])
-                        : SizedBox(width: 0, height: 0);
-                  }).toList(),
-                );
+                return ListView.builder(
+                    itemCount: mappedDocs.length,
+                    itemBuilder: (BuildContext context, index) {
+                      return mappedDocs[index]['name'].toLowerCase().contains(_searchConvo.value.text.toLowerCase())
+                          ? ConversationTile(mappedDocs[index]['convoId'], mappedDocs[index]['name'], mappedDocs[index]['people'])
+                          : SizedBox(width: 0, height: 0);
+                    });
               },
             ),
           ),

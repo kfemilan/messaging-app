@@ -53,7 +53,7 @@ class _ConversationTileState extends State<ConversationTile> {
       }
       Map<String, dynamic> retrievedMessage = messages.docs.elementAt(0).data();
       return Message(
-        message: retrievedMessage['message'],
+        message: retrievedMessage['label'] == "text" ? retrievedMessage['message'] : "Sent an image.",
         senderId: await getName(retrievedMessage['senderID']),
         timeSent: retrievedMessage['timeSent'].toDate(),
       );
@@ -119,8 +119,9 @@ class _ConversationTileState extends State<ConversationTile> {
             } else {
               // More
               print("More");
-              bool edit = await showDialog<bool>(
+              bool editSuccess = await showDialog<bool>(
                   context: context, builder: (BuildContext context) => EditConversationAlertDialog(snapshot.data[0], widget.conversationId));
+              if (editSuccess) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Successfully edited conversation.')));
             }
             return dismiss;
           },
