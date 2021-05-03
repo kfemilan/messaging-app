@@ -25,14 +25,14 @@ class ConversationTile extends StatefulWidget {
 class _ConversationTileState extends State<ConversationTile> {
   Future<String> _getDMName() async {
     if (widget.name != "") return widget.name;
-    DocumentSnapshot convoSnapshot = await FirebaseFirestore.instance
-        .collection('Conversations')
-        .doc(widget.conversationId)
-        .get();
-    List<dynamic> userIds = convoSnapshot.data()['people'];
-    return (userIds[0] == FirebaseAuth.instance.currentUser.uid
-        ? await getName(userIds[1])
-        : await getName(userIds[0]));
+    try {
+      DocumentSnapshot convoSnapshot = await FirebaseFirestore.instance.collection('Conversations').doc(widget.conversationId).get();
+      List<dynamic> userIds = convoSnapshot.data()['people'];
+      return (userIds[0] == FirebaseAuth.instance.currentUser.uid ? await getName(userIds[1]) : await getName(userIds[0]));
+    } on Exception catch (e) {
+      print(e.toString());
+      return "Error getting name";
+    }
   }
 
   @override
@@ -64,7 +64,7 @@ class _ConversationTileState extends State<ConversationTile> {
       builder: (context, snapshot) {
         if (!snapshot.hasData) return SizedBox(height: 0, width: 0);
         return Dismissible(
-          key: Key(widget.message.toString()),
+          key: Key(widget.conversationId.toString()),
           background: Container(
             alignment: Alignment.centerLeft,
             margin: EdgeInsets.only(left: 20.0),
@@ -86,6 +86,10 @@ class _ConversationTileState extends State<ConversationTile> {
                 builder: (BuildContext context) =>
                     DeleteConversationAlertDialog(),
               );
+              bool delSuccess = false;
+              if (dismiss) delSuccess = await deleteConversation(widget.conversationId);
+              if (delSuccess) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Conversation deleted.')));
+              this.dispose();
             } else {
               // More
               print("More");
