@@ -13,9 +13,7 @@ import 'package:path/path.dart';
 class ConversationScreen extends StatefulWidget {
   final conversationID, name, people;
 
-  const ConversationScreen(
-      {Key key, this.conversationID, this.name, this.people})
-      : super(key: key);
+  const ConversationScreen({Key key, this.conversationID, this.name, this.people}) : super(key: key);
   @override
   _ConversationScreenState createState() => _ConversationScreenState();
 }
@@ -33,10 +31,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
     final _firebaseStorage = firebase_storage.FirebaseStorage.instance;
     if (_image != null) {
       //Upload to Firebase
-      var snapshot = await _firebaseStorage
-          .ref()
-          .child('$userID/$imgName')
-          .putFile(_image);
+      var snapshot = await _firebaseStorage.ref().child('$userID/$imgName').putFile(_image);
       // Get image from firebase
       var downloadUrl = await snapshot.ref.getDownloadURL();
       setState(() {
@@ -49,8 +44,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
   }
 
   Future getImage(String option) async {
-    final pickedFile = await picker.getImage(
-        source: option == "Camera" ? ImageSource.camera : ImageSource.gallery);
+    final pickedFile = await picker.getImage(source: option == "Camera" ? ImageSource.camera : ImageSource.gallery);
 
     setState(() {
       if (pickedFile != null) {
@@ -66,15 +60,15 @@ class _ConversationScreenState extends State<ConversationScreen> {
     void _sendMessage() {
       FocusScope.of(context).unfocus();
 
-      FirebaseFirestore.instance
-          .collection('Conversations')
-          .doc('${widget.conversationID}')
-          .collection('Messages')
-          .add({
+      FirebaseFirestore.instance.collection('Conversations').doc('${widget.conversationID}').collection('Messages').add({
         'senderID': userID,
         'message': _message.text,
         'timeSent': DateTime.now(),
       });
+      FirebaseFirestore.instance.collection('Conversations').doc(widget.conversationID).update({
+        'latestMessageTime': DateTime.now(),
+      });
+
       _message.clear();
     }
 
@@ -85,8 +79,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
           title: Column(
             children: [
               Text(widget.name, style: Theme.of(context).textTheme.headline6),
-              Text("Seen 1 hour ago",
-                  style: Theme.of(context).textTheme.headline6),
+              Text("Seen 1 hour ago", style: Theme.of(context).textTheme.headline6),
             ],
           ),
           actions: [
@@ -109,17 +102,13 @@ class _ConversationScreenState extends State<ConversationScreen> {
                       .orderBy('timeSent', descending: true)
                       .snapshots(),
                   builder: (_, chatSnapshot) {
-                    if (chatSnapshot.connectionState !=
-                        ConnectionState.waiting) {
+                    if (chatSnapshot.connectionState != ConnectionState.waiting) {
                       _messages = [];
                       // Snapshot to List
-                      chatSnapshot.data.docs
-                          .map((QueryDocumentSnapshot document) {
+                      chatSnapshot.data.docs.map((QueryDocumentSnapshot document) {
                         print("GG");
-                        return _messages.add(Message(
-                            senderId: document['senderID'],
-                            timeSent: document['timeSent'].toDate(),
-                            message: document['message']));
+                        return _messages
+                            .add(Message(senderId: document['senderID'], timeSent: document['timeSent'].toDate(), message: document['message']));
                       }).toList();
                       _messages.reversed.toList();
                       return ListView.builder(
@@ -127,26 +116,13 @@ class _ConversationScreenState extends State<ConversationScreen> {
                           itemCount: chatSnapshot.data.size,
                           itemBuilder: (_, index) {
                             return Row(
-                              mainAxisAlignment:
-                                  _messages[index].senderId == userID
-                                      ? MainAxisAlignment.end
-                                      : MainAxisAlignment.start,
+                              mainAxisAlignment: _messages[index].senderId == userID ? MainAxisAlignment.end : MainAxisAlignment.start,
                               children: [
-                                if (_messages[index].senderId != userID)
-                                  Image(
-                                      width: 35,
-                                      height: 35,
-                                      image:
-                                          NetworkImage(kDefaultProfilePicture)),
+                                if (_messages[index].senderId != userID) Image(width: 35, height: 35, image: NetworkImage(kDefaultProfilePicture)),
                                 Padding(
-                                  padding: const EdgeInsets.only(
-                                      left: 10.0, bottom: 5.0),
+                                  padding: const EdgeInsets.only(left: 10.0, bottom: 5.0),
                                   child: ChatBubble(
-                                      messages: _messages,
-                                      index: index,
-                                      color: _messages[index].senderId != userID
-                                          ? Colors.white
-                                          : Colors.black),
+                                      messages: _messages, index: index, color: _messages[index].senderId != userID ? Colors.white : Colors.black),
                                 ),
                               ],
                             );
@@ -172,8 +148,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
                     child: Container(
                       margin: EdgeInsets.all(5.0),
                       decoration: BoxDecoration(
-                        border: Border.all(
-                            color: Theme.of(context).primaryColorLight),
+                        border: Border.all(color: Theme.of(context).primaryColorLight),
                         borderRadius: BorderRadius.all(Radius.circular(50.0)),
                       ),
                       child: TextFormField(
@@ -184,15 +159,11 @@ class _ConversationScreenState extends State<ConversationScreen> {
                             contentPadding: EdgeInsets.all(13.0),
                             border: InputBorder.none,
                             hintText: "Enter your message...",
-                            hintStyle: TextStyle(
-                                color: Theme.of(context).primaryColorLight)),
+                            hintStyle: TextStyle(color: Theme.of(context).primaryColorLight)),
                       ),
                     ),
                   ),
-                  IconButton(
-                      color: Theme.of(context).primaryColorLight,
-                      icon: Icon(Icons.send),
-                      onPressed: _sendMessage),
+                  IconButton(color: Theme.of(context).primaryColorLight, icon: Icon(Icons.send), onPressed: _sendMessage),
                 ],
               ),
             ),

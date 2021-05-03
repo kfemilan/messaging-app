@@ -63,7 +63,11 @@ Future<int> createConversation(List<Account> users, String name) async {
       return -1;
     }
 
-    DocumentReference conRef = await FirebaseFirestore.instance.collection('Conversations').add({'name': name, 'people': userIDs});
+    DocumentReference conRef = await FirebaseFirestore.instance.collection('Conversations').add({
+      'name': name,
+      'people': userIDs,
+      'latestMessageTime': DateTime.now(),
+    });
 
     for (var i = 0; i < userIDs.length; i++) {
       DocumentReference userRef = FirebaseFirestore.instance.collection('Users').doc(userIDs[i]);
@@ -86,16 +90,28 @@ Future<String> getName(String userId) async {
     return name;
   } on Exception catch (e) {
     print(e);
-    return "Error Retrieving Name";
+    return "";
   }
 }
 
-Future<bool> deleteConversation(String conversationId) async {
+Future<bool> leaveConversation(String conversationId) async {
   try {
-    await FirebaseFirestore.instance.collection('Conversations').doc(conversationId).delete();
+    // await FirebaseFirestore.instance.collection('Conversations').doc(conversationId).delete();
+    DocumentSnapshot convoSnapshot = await FirebaseFirestore.instance.collection('Conversations').doc(conversationId).get();
+    List<dynamic> people = convoSnapshot.data()['people'];
+
+    if (people.length <= 2) // If only two people are in the convo
+      await FirebaseFirestore.instance.collection('Conversations').doc(conversationId).delete();
+    else {
+      // If Group chat
+      DocumentReference convoRef = FirebaseFirestore.instance.collection('Conversations').doc(conversationId);
+      convoRef.update({
+        'people': FieldValue.arrayRemove([FirebaseAuth.instance.currentUser.uid])
+      });
+    }
     return true;
   } on Exception catch (e) {
-    print("Deletion failed! Error: $e");
+    print("Deletion/Leave failed! Error: $e");
   }
   return false;
 }
