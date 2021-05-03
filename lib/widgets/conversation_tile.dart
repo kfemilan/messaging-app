@@ -5,16 +5,16 @@ import 'package:messaging_app/models/Constants.dart';
 import 'package:messaging_app/models/Message.dart';
 import 'package:messaging_app/screens/conversation_screen.dart';
 
-import 'dart:math'; // for RNG
+import 'dart:math'; // for RNG, 2 remove later
 
 class ConversationTile extends StatelessWidget {
   const ConversationTile(this.conversationId, this.name, this.message, {Key key}) : super(key: key);
   final String name, conversationId;
-  final Message message;
+  final Message message; // This is the last message sent
 
   @override
   Widget build(BuildContext context) {
-    String sender = "";
+    String sender = ""; // To get name of userId
     String time = "Time"; // Just in case of error
     DateTime messageDay = message.timeSent, today = DateTime.now(), lastWeek = DateTime.now().subtract(Duration(days: 7));
 
@@ -48,25 +48,7 @@ class ConversationTile extends StatelessWidget {
           dismiss = await showDialog<bool>(
             context: context,
             builder: (BuildContext context) {
-              return AlertDialog(
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-                title: Text("Delete Conversation?", style: Theme.of(context).textTheme.bodyText1),
-                actions: <Widget>[
-                  TextButton(
-                    child: Text("No", style: TextStyle(color: Colors.grey)),
-                    onPressed: () => Navigator.of(context).pop(false),
-                  ),
-                  Container(
-                    padding: EdgeInsets.symmetric(horizontal: 10),
-                    decoration: BoxDecoration(borderRadius: BorderRadius.circular(5), color: Theme.of(context).primaryColorLight),
-                    child: TextButton(
-                      style: TextButton.styleFrom(backgroundColor: primaryLight),
-                      child: Text("Yes", style: TextStyle(color: Colors.white)),
-                      onPressed: () => Navigator.of(context).pop(true),
-                    ),
-                  ),
-                ],
-              );
+              return DeleteConversationAlertDialog();
             },
           );
         } else {
@@ -96,7 +78,7 @@ class ConversationTile extends StatelessWidget {
                   backgroundImage: NetworkImage(kDefaultProfilePicture),
                 ),
               ),
-              // Center Text
+              // Message Preview
               Expanded(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -109,10 +91,16 @@ class ConversationTile extends StatelessWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text("$sender: ${this.message.message}", style: TextStyle(color: Colors.grey)),
+                        Expanded(
+                          child: Text(
+                            "$sender: ${this.message.message}",
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(color: Colors.grey),
+                          ),
+                        ),
                         Text("$time", style: TextStyle(color: Colors.black)),
                       ],
-                    ), // Timestamp
+                    ),
                   ],
                 ),
               ),
@@ -120,6 +108,33 @@ class ConversationTile extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+class DeleteConversationAlertDialog extends StatelessWidget {
+  const DeleteConversationAlertDialog({Key key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      title: Text("Delete Conversation?", style: Theme.of(context).textTheme.bodyText1),
+      actions: <Widget>[
+        TextButton(
+          child: Text("No", style: TextStyle(color: Colors.grey)),
+          onPressed: () => Navigator.of(context).pop(false),
+        ),
+        Container(
+          padding: EdgeInsets.symmetric(horizontal: 10),
+          decoration: BoxDecoration(borderRadius: BorderRadius.circular(5), color: Theme.of(context).primaryColorLight),
+          child: TextButton(
+            style: TextButton.styleFrom(backgroundColor: primaryLight),
+            child: Text("Yes", style: TextStyle(color: Colors.white)),
+            onPressed: () => Navigator.of(context).pop(true),
+          ),
+        ),
+      ],
     );
   }
 }

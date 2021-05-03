@@ -95,18 +95,30 @@ class _HomeScreenState extends State<HomeScreen> {
           // List of Conversations
           Expanded(
             // To change to Stream Builder once convos work
+            // Ref to
             child: StreamBuilder(
               stream: FirebaseFirestore.instance
                   .collection("Conversations")
-                  .where("People", arrayContains: FirebaseAuth.instance.currentUser.uid)
+                  .where("people", arrayContains: FirebaseAuth.instance.currentUser.uid)
                   .snapshots(),
               builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
                 print(FirebaseAuth.instance.currentUser.uid);
                 if (!snapshot.hasData) return Center(child: CircularProgressIndicator());
                 return ListView(
-                  children: snapshot.data.docs.map((document) {
+                  children: snapshot.data.docs.map((QueryDocumentSnapshot document) {
+                    String convoname = document['name'];
+
+                    String hayst = "";
+                    // getName(FirebaseAuth.instance.currentUser.uid).then((value) => setState());
+
+                    print("lmao $hayst");
+                    List<dynamic> userIds = document['people'];
+                    if (userIds.length == 2) {
+                      // convoname = (userIds[0] == FirebaseAuth.instance.currentUser.uid ? getNameV2(userIds[0]) : getNameV2(userIds[1]));
+                    }
+
                     return document['name'].toLowerCase().contains(_searchConvo.value.text.toLowerCase())
-                        ? ConversationTile(document.id, document['name'], dummyMessage)
+                        ? ConversationTile(document.id, convoname, dummyMessage)
                         : SizedBox(width: 0, height: 0);
                   }).toList(),
                 );
