@@ -88,6 +88,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           style: Theme.of(context).textTheme.headline6),
                       Spacer(),
                       TextFormField(
+                        validator: nameValidation,
                         textCapitalization: TextCapitalization.words,
                         textInputAction: TextInputAction.next,
                         controller: _name,
@@ -106,6 +107,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             ),
                             borderRadius: BorderRadius.circular(15.0),
                           ),
+                          errorStyle: Theme.of(context).textTheme.subtitle2,
+                          errorBorder: OutlineInputBorder(
+                              borderSide:
+                                  BorderSide(width: 1, color: Colors.red),
+                              borderRadius: BorderRadius.circular(15.0)),
                         ),
                       ),
                       Spacer(),
@@ -113,6 +119,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           style: Theme.of(context).textTheme.headline6),
                       Spacer(),
                       TextFormField(
+                        validator: emailValidation,
                         keyboardType: TextInputType.emailAddress,
                         textInputAction: TextInputAction.next,
                         controller: _email,
@@ -131,6 +138,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             ),
                             borderRadius: BorderRadius.circular(15.0),
                           ),
+                          errorStyle: Theme.of(context).textTheme.subtitle2,
+                          errorBorder: OutlineInputBorder(
+                              borderSide:
+                                  BorderSide(width: 1, color: Colors.red),
+                              borderRadius: BorderRadius.circular(15.0)),
                         ),
                       ),
                       Spacer(),
@@ -138,6 +150,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           style: Theme.of(context).textTheme.headline6),
                       Spacer(),
                       TextFormField(
+                        validator: passwordValidation,
                         controller: _password,
                         obscureText: hidePass,
                         style: Theme.of(context).textTheme.bodyText2,
@@ -169,6 +182,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             ),
                             borderRadius: BorderRadius.circular(15.0),
                           ),
+                          errorStyle: Theme.of(context).textTheme.subtitle2,
+                          errorBorder: OutlineInputBorder(
+                              borderSide:
+                                  BorderSide(width: 1, color: Colors.red),
+                              borderRadius: BorderRadius.circular(15.0)),
                         ),
                       ),
                       Spacer(flex: 3),
@@ -183,15 +201,19 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               child: TextButton(
                                 child: Text('Register'),
                                 onPressed: () async {
-                                  bool successful = await register(
-                                      _email.text, _password.text, _name.text);
-                                  if (successful) {
-                                    Navigator.pop(context);
-                                    Navigator.pushReplacement(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                HomeScreen()));
+                                  if (_formKey.currentState.validate()) {
+                                    bool successful = await register(
+                                        _email.text,
+                                        _password.text,
+                                        _name.text);
+                                    if (successful) {
+                                      Navigator.pop(context);
+                                      Navigator.pushReplacement(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  HomeScreen()));
+                                    }
                                   }
                                 },
                               ),
@@ -210,6 +232,27 @@ class _RegisterScreenState extends State<RegisterScreen> {
       ),
     );
   }
-}
 
-class HomePage {}
+  String nameValidation(String value) {
+    if (value.isEmpty) {
+      return 'Name is Empty!';
+    }
+    return null;
+  }
+
+  String emailValidation(String value) {
+    if (value.isEmpty) {
+      return 'Email is Empty!';
+    }
+    return null;
+  }
+
+  String passwordValidation(String value) {
+    if (value.isEmpty) {
+      return 'Password is Empty!';
+    } else if (value.length < 6) {
+      return 'Password must be atleast 6 character!';
+    }
+    return null;
+  }
+}

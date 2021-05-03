@@ -36,7 +36,7 @@ class _ConfirmCreateScreenState extends State<ConfirmCreateScreen> {
             icon: Icon(Icons.arrow_forward_ios_rounded),
             onPressed: () async {
               if(_gcName.text == ""){
-                // Create automatically generated name
+                _gcName.text = defaultGCName(finalSelected);
               }
               int successful = await createConversation(finalSelected, _gcName.text);
               if (successful == 1) {

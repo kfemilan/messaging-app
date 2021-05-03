@@ -141,7 +141,7 @@ class _ConversationTileState extends State<ConversationTile> {
                     child: CircleAvatar(
                       radius: 30.0,
                       backgroundColor: Colors.white,
-                      backgroundImage: NetworkImage(kDefaultProfilePicture),
+                      backgroundImage: AssetImage('assets/defaultpp.jpg'),
                     ),
                   ),
                   // Message Preview

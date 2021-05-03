@@ -8,11 +8,12 @@ Color secondary = Colors.white;
 
 ThemeData appTheme = ThemeData(
   textTheme: TextTheme(
-      headline6: TextStyle(color: secondary, fontWeight: FontWeight.bold, fontSize: 15),
-      headline3: TextStyle(color: primaryMedium, fontWeight: FontWeight.w700, fontSize: 20, fontFamily: 'Barlow'),
-      headline1: TextStyle(color: primaryMedium, fontWeight: FontWeight.w900, fontSize: 45, fontFamily: 'Barlow'),
-      bodyText2: TextStyle(color: secondary, fontSize: 15),
-      subtitle2: TextStyle(color: Colors.redAccent)),
+    headline6: TextStyle(color: secondary, fontWeight: FontWeight.bold, fontSize: 15),
+    headline3: TextStyle(color: primaryMedium, fontWeight: FontWeight.w700, fontSize: 20, fontFamily: 'Barlow'),
+    headline1: TextStyle(color: primaryMedium, fontWeight: FontWeight.w900, fontSize: 45, fontFamily: 'Barlow'),
+    bodyText2: TextStyle(color: secondary, fontSize: 15),
+    subtitle2: TextStyle(color: Colors.redAccent)
+  ),
   primaryColorLight: primaryLight,
   primaryColor: primaryMedium,
   primaryColorDark: primaryDark,
