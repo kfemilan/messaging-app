@@ -82,9 +82,12 @@ Future<int> createConversation(List<Account> users, String name) async {
 }
 
 Future<String> getName(String userId) async {
-  DocumentReference userRef = FirebaseFirestore.instance.collection('Users').doc(userId);
-  var name = (await userRef.get()).data()['name'] as String;
-  print(name);
-  print("+GETNAME");
-  return name;
+  try {
+    DocumentSnapshot userSnapshot = await FirebaseFirestore.instance.collection('Users').doc(userId).get();
+    String name = userSnapshot.data()['name'] as String;
+    return name;
+  } on Exception catch (e) {
+    print(e);
+    return "Error Retrieving Name";
+  }
 }
