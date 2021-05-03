@@ -35,19 +35,20 @@ class _ConfirmCreateScreenState extends State<ConfirmCreateScreen> {
           IconButton(
             icon: Icon(Icons.arrow_forward_ios_rounded),
             onPressed: () async {
-              if(_gcName.text == ""){
+              if (_gcName.text == "") {
                 _gcName.text = defaultGCName(finalSelected);
               }
-              int successful = await createConversation(finalSelected, _gcName.text);
-              if (successful == 1) {
+              String output =
+                  await createConversation(finalSelected, _gcName.text);
+              if (output == "Error") {
+                print("Error creating conversation");
+              } else {
                 Navigator.pop(context);
                 Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => ConversationScreen()));
-              } else if (successful == -1) {
-                Navigator.pop(context);
-                // pushReplacement to Conversation screen of GC
+                        builder: (context) => ConversationScreen(
+                            conversationID: output, name: _gcName.text)));
               }
             },
           )
