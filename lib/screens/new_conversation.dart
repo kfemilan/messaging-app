@@ -17,6 +17,7 @@ class NewConversationScreen extends StatefulWidget {
 class _NewConversationScreenState extends State<NewConversationScreen> {
   TextEditingController _name = new TextEditingController();
   List<Account> selected = [];
+  String userID2, name;
 
   @override
   Widget build(BuildContext context) {
@@ -36,18 +37,24 @@ class _NewConversationScreenState extends State<NewConversationScreen> {
                   Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => ConversationScreen()));
-                } else if (successful == -1){
+                          builder: (context) => ConversationScreen(
+                                  name: name,
+                                  people: [
+                                    userID2,
+                                    FirebaseAuth.instance.currentUser.uid
+                                  ])));
+                } else if (successful == -1) {
                   // Navigate to Existing Chat screen
                   // For now Pop lang sa
                   Navigator.pop(context);
                 }
               } else if (selected.length > 1) {
                 Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) =>
-                            ConfirmCreateScreen(selected: selected))).then((value) => setState((){}));
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                ConfirmCreateScreen(selected: selected)))
+                    .then((value) => setState(() {}));
               }
             },
           )
@@ -132,15 +139,22 @@ class _NewConversationScreenState extends State<NewConversationScreen> {
                                                         .size
                                                         .width *
                                                     0.07,
-                                                child: Text(selected[i].name[0].toUpperCase()),
+                                                child: Text(selected[i]
+                                                    .name[0]
+                                                    .toUpperCase()),
                                               ),
                                               Container(
                                                 width: 20,
                                                 height: 20,
                                                 child: FloatingActionButton(
-                                                  backgroundColor: Theme.of(context).primaryColorLight,
+                                                    backgroundColor:
+                                                        Theme.of(context)
+                                                            .primaryColorLight,
                                                     heroTag: selected[i].id,
-                                                    child: Icon(Icons.close, size: 15, color: Theme.of(context).accentColor),
+                                                    child: Icon(Icons.close,
+                                                        size: 15,
+                                                        color: Theme.of(context)
+                                                            .accentColor),
                                                     onPressed: () {
                                                       setState(() {
                                                         selected.removeWhere(
@@ -190,10 +204,14 @@ class _NewConversationScreenState extends State<NewConversationScreen> {
                                   }
                                   return ListTile(
                                     leading: CircleAvatar(
-                                      child: Text(document['name'][0].toString().toUpperCase())
-                                    ),
+                                        child: Text(document['name'][0]
+                                            .toString()
+                                            .toUpperCase())),
                                     title: Text(document['name']),
                                     onTap: () {
+                                      userID2 = document.id;
+                                      name = document['name'];
+
                                       Account temp = new Account(
                                           id: document.id,
                                           name: document['name'],
