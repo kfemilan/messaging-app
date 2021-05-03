@@ -51,14 +51,13 @@ Future<bool> signOut() async {
 
 Future<int> createConversation(List<Account> users, String name) async {
   try {
-
     // Get uID of current user
     var uID = FirebaseAuth.instance.currentUser.uid;
     List<String> userIDs = users.map((value) => value.id).toList();
     userIDs.add(uID);
     userIDs.sort();
-    
-    if (userIDs.length == 2){
+
+    if (userIDs.length == 2) {
       QuerySnapshot x = await FirebaseFirestore.instance.collection("Conversations").where("people", isEqualTo: userIDs).get();
       print(x.size);
       if (x.size != 0) {
@@ -66,23 +65,29 @@ Future<int> createConversation(List<Account> users, String name) async {
       }
     }
 
-
-    DocumentReference conRef = await FirebaseFirestore.instance
-        .collection('Conversations')
-        .add({'name': name, 'people': userIDs});
+    DocumentReference conRef = await FirebaseFirestore.instance.collection('Conversations').add({'name': name, 'people': userIDs});
 
     for (var i = 0; i < userIDs.length; i++) {
-      DocumentReference userRef =
-          FirebaseFirestore.instance.collection('Users').doc(userIDs[i]);
+      DocumentReference userRef = FirebaseFirestore.instance.collection('Users').doc(userIDs[i]);
       userRef.update({
         'conversations': FieldValue.arrayUnion([conRef.id])
       });
-
     }
 
     return 1;
   } catch (e) {
     print(e);
     return 0;
+  }
+}
+
+Future<String> getName(String userId) async {
+  try {
+    DocumentSnapshot userSnapshot = await FirebaseFirestore.instance.collection('Users').doc(userId).get();
+    String name = userSnapshot.data()['name'] as String;
+    return name;
+  } on Exception catch (e) {
+    print(e);
+    return "Error Retrieving Name";
   }
 }
