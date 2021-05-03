@@ -85,6 +85,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           style: Theme.of(context).textTheme.headline6),
                       Spacer(),
                       TextFormField(
+                        validator: loginValidation,
                         keyboardType: TextInputType.emailAddress,
                         textInputAction: TextInputAction.next,
                         controller: _email,
@@ -103,6 +104,9 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                             borderRadius: BorderRadius.circular(15.0),
                           ),
+                          errorStyle: Theme.of(context).textTheme.subtitle2,
+                          errorBorder: OutlineInputBorder(borderSide: BorderSide(width: 1, color: Colors.red),
+                          borderRadius: BorderRadius.circular(15.0)),
                         ),
                       ),
                       Spacer(flex: 3),
@@ -110,6 +114,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           style: Theme.of(context).textTheme.headline6),
                       Spacer(),
                       TextFormField(
+                        validator: passwordValidation,
                         controller: _password,
                         obscureText: hidePass,
                         style: Theme.of(context).textTheme.bodyText2,
@@ -141,6 +146,9 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                             borderRadius: BorderRadius.circular(15.0),
                           ),
+                          errorStyle: Theme.of(context).textTheme.subtitle2,
+                          errorBorder: OutlineInputBorder(borderSide: BorderSide(width: 1, color: Colors.red),
+                          borderRadius: BorderRadius.circular(15.0)),
                         ),
                       ),
                       Spacer(flex: 3),
@@ -155,10 +163,17 @@ class _LoginScreenState extends State<LoginScreen> {
                               child: TextButton(
                                 child: Text('Sign In'),
                                 onPressed: () async {
-                                  bool successful = await signIn(_email.text, _password.text);
-                                  if (successful) {
-                                    Navigator.pop(context);
-                                    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => HomeScreen()));
+                                  if (_formKey.currentState.validate()) {
+                                    bool successful = await signIn(
+                                        _email.text, _password.text);
+                                    if (successful) {
+                                      Navigator.pop(context);
+                                      Navigator.pushReplacement(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  HomeScreen()));
+                                    }
                                   }
                                 },
                               ),
@@ -177,5 +192,20 @@ class _LoginScreenState extends State<LoginScreen> {
       ),
     );
   }
-}
 
+  String loginValidation(String value) {
+    if (value.isEmpty) {
+      return 'Username is Empty!';
+    }
+    return null;
+  }
+
+  String passwordValidation(String value) {
+    if (value.isEmpty) {
+      return 'Password is Empty!';
+    } else if (value.length < 6) {
+      return 'Password must be atleast 6 character!';
+    }
+    return null;
+  }
+}
