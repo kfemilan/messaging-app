@@ -17,6 +17,7 @@ class NewConversationScreen extends StatefulWidget {
 class _NewConversationScreenState extends State<NewConversationScreen> {
   TextEditingController _name = new TextEditingController();
   List<Account> selected = [];
+  String userID2, name;
 
   @override
   Widget build(BuildContext context) {
@@ -36,7 +37,12 @@ class _NewConversationScreenState extends State<NewConversationScreen> {
                   Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => ConversationScreen()));
+                          builder: (context) => ConversationScreen(
+                                  name: name,
+                                  people: [
+                                    userID2,
+                                    FirebaseAuth.instance.currentUser.uid
+                                  ])));
                 } else if (successful == -1) {
                   // Navigate to Existing Chat screen
                   // For now Pop lang sa

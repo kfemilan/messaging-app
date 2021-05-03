@@ -11,7 +11,11 @@ import 'package:messaging_app/database/flutterfire.dart';
 import 'dart:math'; // for RNG, 2 remove later
 
 class ConversationTile extends StatefulWidget {
-  const ConversationTile(this.conversationId, this.name, this.message, {Key key}) : super(key: key);
+  const ConversationTile(
+      this.conversationId, this.name, this.people, this.message,
+      {Key key})
+      : super(key: key);
+  final people;
   final String name, conversationId;
   final Message message;
   @override
@@ -21,23 +25,35 @@ class ConversationTile extends StatefulWidget {
 class _ConversationTileState extends State<ConversationTile> {
   Future<String> _getDMName() async {
     if (widget.name != "") return widget.name;
-    DocumentSnapshot convoSnapshot = await FirebaseFirestore.instance.collection('Conversations').doc(widget.conversationId).get();
+    DocumentSnapshot convoSnapshot = await FirebaseFirestore.instance
+        .collection('Conversations')
+        .doc(widget.conversationId)
+        .get();
     List<dynamic> userIds = convoSnapshot.data()['people'];
-    return (userIds[0] == FirebaseAuth.instance.currentUser.uid ? await getName(userIds[1]) : await getName(userIds[0]));
+    return (userIds[0] == FirebaseAuth.instance.currentUser.uid
+        ? await getName(userIds[1])
+        : await getName(userIds[0]));
   }
 
   @override
   Widget build(BuildContext context) {
     String sender = ""; // To get name of userId
     String time = "Time"; // Just in case of error
-    DateTime messageDay = widget.message.timeSent, today = DateTime.now(), lastWeek = DateTime.now().subtract(Duration(days: 7));
+    DateTime messageDay = widget.message.timeSent,
+        today = DateTime.now(),
+        lastWeek = DateTime.now().subtract(Duration(days: 7));
 
-    if (today.day == messageDay.day && today.month == messageDay.month && today.year == messageDay.year)
-      time = DateFormat.jm().format(widget.message.timeSent); // Same day, just time
+    if (today.day == messageDay.day &&
+        today.month == messageDay.month &&
+        today.year == messageDay.year)
+      time = DateFormat.jm()
+          .format(widget.message.timeSent); // Same day, just time
     else if (messageDay.compareTo(lastWeek) >= 0)
-      time = DateFormat.E().format(widget.message.timeSent); // WeekdayAbbr e.g. Fri
+      time = DateFormat.E()
+          .format(widget.message.timeSent); // WeekdayAbbr e.g. Fri
     else
-      time = DateFormat.MMMd().format(widget.message.timeSent); // MonthAbbr Date e.g. Mar 1
+      time = DateFormat.MMMd()
+          .format(widget.message.timeSent); // MonthAbbr Date e.g. Mar 1
 
     // to remove later
     var rng = Random();
@@ -52,12 +68,14 @@ class _ConversationTileState extends State<ConversationTile> {
           background: Container(
             alignment: Alignment.centerLeft,
             margin: EdgeInsets.only(left: 20.0),
-            child: Icon(Icons.more, color: Theme.of(context).primaryColorLight, size: 30),
+            child: Icon(Icons.more,
+                color: Theme.of(context).primaryColorLight, size: 30),
           ),
           secondaryBackground: Container(
             alignment: Alignment.centerRight,
             margin: EdgeInsets.only(right: 20.0),
-            child: Icon(Icons.delete, color: Theme.of(context).primaryColorLight, size: 30),
+            child: Icon(Icons.delete,
+                color: Theme.of(context).primaryColorLight, size: 30),
           ),
           confirmDismiss: (direction) async {
             bool dismiss = false;
@@ -65,7 +83,8 @@ class _ConversationTileState extends State<ConversationTile> {
               // Delete
               dismiss = await showDialog<bool>(
                 context: context,
-                builder: (BuildContext context) => DeleteConversationAlertDialog(),
+                builder: (BuildContext context) =>
+                    DeleteConversationAlertDialog(),
               );
             } else {
               // More
@@ -74,7 +93,13 @@ class _ConversationTileState extends State<ConversationTile> {
             return dismiss;
           },
           child: InkWell(
-            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => ConversationScreen())),
+            onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => ConversationScreen(
+                        conversationID: widget.conversationId,
+                        name: snapshot.data,
+                        people: widget.people))),
             child: Container(
               height: 75.0,
               width: MediaQuery.of(context).size.width,
@@ -102,7 +127,10 @@ class _ConversationTileState extends State<ConversationTile> {
                       children: [
                         Text(
                           "${snapshot.data}",
-                          style: TextStyle(color: Colors.black, fontWeight: FontWeight.w700, fontSize: 16.0),
+                          style: TextStyle(
+                              color: Colors.black,
+                              fontWeight: FontWeight.w700,
+                              fontSize: 16.0),
                         ),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -114,7 +142,8 @@ class _ConversationTileState extends State<ConversationTile> {
                                 style: TextStyle(color: Colors.grey),
                               ),
                             ),
-                            Text("$time", style: TextStyle(color: Colors.black)),
+                            Text("$time",
+                                style: TextStyle(color: Colors.black)),
                           ],
                         ),
                       ],
@@ -138,7 +167,8 @@ class DeleteConversationAlertDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     return AlertDialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-      title: Text("Delete Conversation?", style: Theme.of(context).textTheme.bodyText1),
+      title: Text("Delete Conversation?",
+          style: Theme.of(context).textTheme.bodyText1),
       actions: <Widget>[
         TextButton(
           child: Text("No", style: TextStyle(color: Colors.grey)),
@@ -146,7 +176,9 @@ class DeleteConversationAlertDialog extends StatelessWidget {
         ),
         Container(
           padding: EdgeInsets.symmetric(horizontal: 10),
-          decoration: BoxDecoration(borderRadius: BorderRadius.circular(5), color: Theme.of(context).primaryColorLight),
+          decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(5),
+              color: Theme.of(context).primaryColorLight),
           child: TextButton(
             style: TextButton.styleFrom(backgroundColor: primaryLight),
             child: Text("Yes", style: TextStyle(color: Colors.white)),
