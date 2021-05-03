@@ -17,6 +17,7 @@ class NewConversationScreen extends StatefulWidget {
 class _NewConversationScreenState extends State<NewConversationScreen> {
   TextEditingController _name = new TextEditingController();
   List<Account> selected = [];
+  String userID2, name;
 
   @override
   Widget build(BuildContext context) {
@@ -36,18 +37,26 @@ class _NewConversationScreenState extends State<NewConversationScreen> {
                   Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => ConversationScreen()));
-                } else if (successful == -1){
+                          builder: (context) => ConversationScreen(
+                                  name: name,
+                                  people: [
+                                    userID2,
+                                    FirebaseAuth.instance.currentUser.uid
+                                  ])));
+                } else if (successful == -1) {
                   // Navigate to Existing Chat screen
                   // For now Pop lang sa
                   Navigator.pop(context);
                 }
               } else if (selected.length > 1) {
                 Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) =>
-                            ConfirmCreateScreen(selected: selected))).then((value) => setState((){}));
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                ConfirmCreateScreen(selected: selected)))
+                    .then((value) => setState(() {}));
+              } else {
+                showErrorDialog();
               }
             },
           )
@@ -110,51 +119,61 @@ class _NewConversationScreenState extends State<NewConversationScreen> {
                             scrollDirection: Axis.horizontal,
                             itemCount: selected.length,
                             itemBuilder: (context, i) {
-                              return selected.length <= 0
-                                  ? Center(
-                                      child: Text(
+                              return selected.isEmpty
+                                  ? Text(
                                       'Select Users...',
-                                      style: TextStyle(color: Colors.black),
-                                    ))
+                                      style: TextStyle(
+                                          color: Theme.of(context)
+                                              .primaryColorDark),
+                                    )
                                   : Container(
                                       padding: EdgeInsets.all(5),
                                       width: MediaQuery.of(context).size.width *
                                           0.2,
+                                      height: MediaQuery.of(context).size.height * 0.1,
                                       child: Column(
                                         mainAxisAlignment:
                                             MainAxisAlignment.center,
                                         children: [
-                                          Stack(
-                                            alignment: Alignment.topRight,
-                                            children: [
-                                              CircleAvatar(
-                                                radius: MediaQuery.of(context)
-                                                        .size
-                                                        .width *
-                                                    0.07,
-                                                child: Text(selected[i].name[0].toUpperCase()),
-                                              ),
-                                              Container(
-                                                width: 20,
-                                                height: 20,
-                                                child: FloatingActionButton(
-                                                  backgroundColor: Theme.of(context).primaryColorLight,
-                                                    heroTag: selected[i].id,
-                                                    child: Icon(Icons.close, size: 15, color: Theme.of(context).accentColor),
-                                                    onPressed: () {
-                                                      setState(() {
-                                                        selected.removeWhere(
-                                                            (element) =>
-                                                                element.id ==
-                                                                selected[i].id);
-                                                      });
-                                                    }),
-                                              )
-                                            ],
+                                          FittedBox(
+                                            child: Stack(
+                                              alignment: Alignment.topRight,
+                                              children: [
+                                                CircleAvatar(
+                                                  radius: MediaQuery.of(context)
+                                                          .size
+                                                          .width *
+                                                      0.07,
+                                                  child: Text(selected[i]
+                                                      .name[0]
+                                                      .toUpperCase()),
+                                                ),
+                                                Container(
+                                                  width: 20,
+                                                  height: 20,
+                                                  child: FloatingActionButton(
+                                                      backgroundColor: Theme.of(
+                                                              context)
+                                                          .primaryColorLight,
+                                                      heroTag: selected[i].id,
+                                                      child: Icon(Icons.close,
+                                                          size: 15,
+                                                          color:
+                                                              Theme.of(context)
+                                                                  .accentColor),
+                                                      onPressed: () {
+                                                        removeFromSelected(i);
+                                                      }),
+                                                )
+                                              ],
+                                            ),
                                           ),
-                                          Text(selected[i].name.split(" ")[0],
-                                              style: TextStyle(
-                                                  color: Colors.black))
+                                          FittedBox(
+                                            child: Text(
+                                                selected[i].name.split(" ")[0],
+                                                style: TextStyle(
+                                                    color: Colors.black)),
+                                          )
                                         ],
                                       ),
                                     );
@@ -163,8 +182,8 @@ class _NewConversationScreenState extends State<NewConversationScreen> {
                           decoration: BoxDecoration(
                               border: Border(
                                   bottom: BorderSide(
-                                      color: Theme.of(context).primaryColorDark,
-                                      width: 1))),
+                                      color: Theme.of(context).primaryColorLight,
+                                      width: 2))),
                         ),
                         Expanded(
                           // List of Users
@@ -188,26 +207,40 @@ class _NewConversationScreenState extends State<NewConversationScreen> {
                                   if (uID == document.id) {
                                     return SizedBox();
                                   }
-                                  return ListTile(
-                                    leading: CircleAvatar(
-                                      child: Text(document['name'][0].toString().toUpperCase())
+                                  return Container(
+                                    child: ListTile(
+                                      leading: CircleAvatar(
+                                          child: Text(document['name'][0]
+                                              .toString()
+                                              .toUpperCase())),
+                                      title: Text(document['name'],
+                                          style: TextStyle(
+                                              color: Theme.of(context)
+                                                  .primaryColorDark)),
+                                      selected: (selected.firstWhere(
+                                                  (sel) => sel.id == document.id,
+                                                  orElse: () => null) ==
+                                              null)
+                                          ? false
+                                          : true,
+                                      selectedTileColor:
+                                          Theme.of(context).primaryColorLight,
+                                      onTap: () {
+                                        Account temp = new Account(
+                                            id: document.id,
+                                            name: document['name'],
+                                            email: document['email']);
+                                        var contain = selected.where(
+                                            (element) => element.id == temp.id);
+                                        if (contain.isEmpty) {
+                                          addToSelected(temp);
+                                        } else {
+                                          var i = selected.indexWhere((element) =>
+                                              element.id == document.id);
+                                          removeFromSelected(i);
+                                        }
+                                      },
                                     ),
-                                    title: Text(document['name']),
-                                    onTap: () {
-                                      Account temp = new Account(
-                                          id: document.id,
-                                          name: document['name'],
-                                          email: document['email']);
-                                      var contain = selected.where(
-                                          (element) => element.id == temp.id);
-                                      if (contain.isEmpty) {
-                                        setState(() {
-                                          selected.add(temp);
-                                          print(temp.name);
-                                          print(selected);
-                                        });
-                                      }
-                                    },
                                   );
                                 }).toList(),
                               );
@@ -223,4 +256,35 @@ class _NewConversationScreenState extends State<NewConversationScreen> {
           )),
     );
   }
+
+  removeFromSelected(i) {
+    setState(() {
+      selected.removeWhere((element) => element.id == selected[i].id);
+    });
+  }
+
+  addToSelected(temp) {
+    setState(() {
+      selected.add(temp);
+      print(temp.name);
+      print(selected);
+    });
+  }
+
+  showErrorDialog() {
+    return showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('No User Selected!', style: Theme.of(context).textTheme.headline3),
+          content: Text('Please select a user to start a conversation.'),
+          actions: [
+            TextButton(child: Text('Ok'), onPressed: (){Navigator.pop(context);},)
+          ],
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(15))),
+        );
+      }
+    );
+  }
+
 }

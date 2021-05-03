@@ -57,12 +57,10 @@ Future<int> createConversation(List<Account> users, String name) async {
     userIDs.add(uID);
     userIDs.sort();
 
-    if (userIDs.length == 2) {
-      QuerySnapshot x = await FirebaseFirestore.instance.collection("Conversations").where("people", isEqualTo: userIDs).get();
-      print(x.size);
-      if (x.size != 0) {
-        return -1;
-      }
+    QuerySnapshot x = await FirebaseFirestore.instance.collection("Conversations").where("people", isEqualTo: userIDs).get();
+    print(x.size);
+    if (x.size != 0) {
+      return -1;
     }
 
     DocumentReference conRef = await FirebaseFirestore.instance.collection('Conversations').add({'name': name, 'people': userIDs});
