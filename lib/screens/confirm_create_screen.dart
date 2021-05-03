@@ -35,6 +35,9 @@ class _ConfirmCreateScreenState extends State<ConfirmCreateScreen> {
           IconButton(
             icon: Icon(Icons.arrow_forward_ios_rounded),
             onPressed: () async {
+              if(_gcName.text == ""){
+                // Create automatically generated name
+              }
               int successful = await createConversation(finalSelected, _gcName.text);
               if (successful == 1) {
                 Navigator.pop(context);
@@ -42,6 +45,9 @@ class _ConfirmCreateScreenState extends State<ConfirmCreateScreen> {
                     context,
                     MaterialPageRoute(
                         builder: (context) => ConversationScreen()));
+              } else if (successful == -1) {
+                Navigator.pop(context);
+                // pushReplacement to Conversation screen of GC
               }
             },
           )
