@@ -32,6 +32,7 @@ ThemeData appTheme = ThemeData(
     headline3: TextStyle(color: primaryMedium, fontWeight: FontWeight.w700, fontSize: 20, fontFamily: 'Barlow'),
     headline1: TextStyle(color: primaryMedium, fontWeight: FontWeight.w900, fontSize: 45, fontFamily: 'Barlow'),
     bodyText2: TextStyle(color: secondary, fontSize: 15),
+    subtitle2: TextStyle(color: Colors.redAccent)
   ),
   primaryColorLight: primaryLight,
   primaryColor: primaryMedium,
