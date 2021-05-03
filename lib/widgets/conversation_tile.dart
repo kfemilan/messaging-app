@@ -3,10 +3,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-import 'package:messaging_app/models/Constants.dart';
 import 'package:messaging_app/models/Message.dart';
 import 'package:messaging_app/screens/conversation_screen.dart';
 import 'package:messaging_app/database/flutterfire.dart';
+import 'package:messaging_app/widgets/alert_dialogs.dart';
 
 class ConversationTile extends StatefulWidget {
   const ConversationTile(this.conversationId, this.name, this.people, {Key key}) : super(key: key);
@@ -80,6 +80,8 @@ class _ConversationTileState extends State<ConversationTile> {
     return FutureBuilder(
       future: _retrieveData(),
       builder: (context, snapshot) {
+        // Name of Convo is at index 0
+        // Message is at index 1
         if (!snapshot.hasData) return SizedBox(height: 0, width: 0);
         // Once latest message is retrieved
         latestMessage = snapshot.data[1];
@@ -117,6 +119,8 @@ class _ConversationTileState extends State<ConversationTile> {
             } else {
               // More
               print("More");
+              bool edit = await showDialog<bool>(
+                  context: context, builder: (BuildContext context) => EditConversationAlertDialog(snapshot.data[0], widget.conversationId));
             }
             return dismiss;
           },
@@ -151,7 +155,7 @@ class _ConversationTileState extends State<ConversationTile> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          "${snapshot.data[0]}",
+                          "${snapshot.data[0]}", // Convo Name
                           style: TextStyle(color: Colors.black, fontWeight: FontWeight.w700, fontSize: 16.0),
                         ),
                         Row(
@@ -176,34 +180,6 @@ class _ConversationTileState extends State<ConversationTile> {
           ),
         );
       },
-    );
-  }
-}
-
-// Separated since it was getting a bit too unreadable
-class DeleteConversationAlertDialog extends StatelessWidget {
-  const DeleteConversationAlertDialog({Key key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return AlertDialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-      title: Text("Leave Conversation?", style: Theme.of(context).textTheme.bodyText1),
-      actions: <Widget>[
-        TextButton(
-          child: Text("No", style: TextStyle(color: Colors.grey)),
-          onPressed: () => Navigator.of(context).pop(false),
-        ),
-        Container(
-          padding: EdgeInsets.symmetric(horizontal: 10),
-          decoration: BoxDecoration(borderRadius: BorderRadius.circular(5), color: Theme.of(context).primaryColorLight),
-          child: TextButton(
-            style: TextButton.styleFrom(backgroundColor: primaryLight),
-            child: Text("Yes", style: TextStyle(color: Colors.white)),
-            onPressed: () => Navigator.of(context).pop(true),
-          ),
-        ),
-      ],
     );
   }
 }
