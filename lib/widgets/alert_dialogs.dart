@@ -80,10 +80,16 @@ class _EditConversationAlertDialogState extends State<EditConversationAlertDialo
             style: TextButton.styleFrom(backgroundColor: primaryLight),
             child: Text("Confirm Changes", style: TextStyle(color: Colors.white)),
             onPressed: () {
-              print(_convoNameController.text);
               if (_convoNameController.text.isEmpty) Navigator.of(context).pop(false);
-              FirebaseFirestore.instance.collection("Conversations").doc(widget.conversationId).update({'name': _convoNameController.text});
-              Navigator.of(context).pop(true);
+              try {
+                FirebaseFirestore.instance.collection("Conversations").doc(widget.conversationId).update({'name': _convoNameController.text});
+                Navigator.of(context).pop(true);
+              } on Exception catch (e) {
+                print(e.toString());
+                Navigator.of(context).pop(false);
+              }
+              Navigator.of(context).pop(false);
+              this.dispose();
             },
           ),
         ),

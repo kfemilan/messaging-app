@@ -23,6 +23,7 @@ class _ConversationTileState extends State<ConversationTile> {
       timeSent: DateTime.now(),
       senderId: "Error");
   String time = "Time"; // Just in case of error
+  bool isSeen = false;
 
   Future<String> _getDMName() async {
     if (widget.name != "") return widget.name;
@@ -65,7 +66,7 @@ class _ConversationTileState extends State<ConversationTile> {
       }
       Map<String, dynamic> retrievedMessage = messages.docs.elementAt(0).data();
       return Message(
-        message: retrievedMessage['message'],
+        message: retrievedMessage['label'] == "text" ? retrievedMessage['message'] : "Sent an image.",
         senderId: await getName(retrievedMessage['senderID']),
         timeSent: retrievedMessage['timeSent'].toDate(),
       );
@@ -78,21 +79,30 @@ class _ConversationTileState extends State<ConversationTile> {
     }
   }
 
+  Future<bool> _getSeen() async {
+    try {
+      DocumentSnapshot convoSnapshot = await FirebaseFirestore.instance.collection('Conversations').doc(widget.conversationId).get();
+      print("hayst");
+      // print(convoSnapshot.data()['lastSeen'][0]);
+      // DateTime lastSeen = convoSnapshot.data()['lastSeen'][FirebaseAuth.instance.currentUser.uid];
+      // print(lastSeen);
+      return false;
+    } on Exception catch (e) {
+      print(e.toString());
+    }
+    return false;
+  }
+
   Future<List<dynamic>> _retrieveData() async {
     try {
       String dmName = await _getDMName(); // Name of Convo is at index 0
       Message message = await _getLatestMessage(); // Message is at index 1
-      return [dmName, message];
+      bool hasSeen = await _getSeen();
+      return [dmName, message, hasSeen];
     } on Exception catch (e) {
       print(e.toString());
     }
-    return [
-      "",
-      Message(
-          message: "Error retrieving Message",
-          timeSent: DateTime.now(),
-          senderId: "Error")
-    ];
+    return ["", Message(message: "Error retrieving Message", timeSent: DateTime.now(), senderId: "Error"), false];
   }
 
   @override
@@ -105,15 +115,17 @@ class _ConversationTileState extends State<ConversationTile> {
       builder: (context, snapshot) {
         // Name of Convo is at index 0
         // Message is at index 1
+        // Seen is at index 2
         if (!snapshot.hasData) return SizedBox(height: 0, width: 0);
         // Once latest message is retrieved
         latestMessage = snapshot.data[1];
+        isSeen = snapshot.data[2];
 
         if (today.day == messageDay.day &&
             today.month == messageDay.month &&
             today.year == messageDay.year)
           time = DateFormat.jm()
-              .format(latestMessage.timeSent); // Same day, just time
+              .format(latestMessage.timeSent); // Same day, just
         else if (messageDay.compareTo(lastWeek) >= 0)
           time = DateFormat.E()
               .format(latestMessage.timeSent); // WeekdayAbbr e.g. Fri
@@ -162,7 +174,9 @@ class _ConversationTileState extends State<ConversationTile> {
             return dismiss;
           },
           child: InkWell(
-            onTap: () => Navigator.push(
+            onTap: () {
+              updateSeenTimeStamp(widget.conversationId);
+              return Navigator.push(
                 context,
                 MaterialPageRoute(
                     builder: (context) => ConversationScreen(
@@ -209,7 +223,7 @@ class _ConversationTileState extends State<ConversationTile> {
                                     (latestMessage.senderId == "" ? "" : ": ") +
                                     latestMessage.message,
                                 overflow: TextOverflow.ellipsis,
-                                style: TextStyle(color: Colors.grey),
+                                style: TextStyle(color: isSeen ? Colors.grey : Theme.of(context).primaryColorLight),
                               ),
                             ),
                             Text("$time",
