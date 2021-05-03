@@ -67,6 +67,7 @@ Future<int> createConversation(List<Account> users, String name) async {
       'name': name,
       'people': userIDs,
       'latestMessageTime': DateTime.now(),
+      'lastSeen': {FirebaseAuth.instance.currentUser.uid: DateTime.now()},
     });
 
     for (var i = 0; i < userIDs.length; i++) {
@@ -114,4 +115,17 @@ Future<bool> leaveConversation(String conversationId) async {
     print("Deletion/Leave failed! Error: $e");
   }
   return false;
+}
+
+Future<void> updateSeenTimeStamp(String conversationId) async {
+  try {
+    DocumentSnapshot convoSnapshot = await FirebaseFirestore.instance.collection('Conversations').doc(conversationId).get();
+    Map<String, dynamic> everyoneLastSeen = convoSnapshot.data()['lastSeen'];
+    print(everyoneLastSeen);
+    everyoneLastSeen[FirebaseAuth.instance.currentUser.uid] = DateTime.now();
+    print(everyoneLastSeen);
+    await FirebaseFirestore.instance.collection("Conversations").doc(conversationId).update({'lastSeen': (everyoneLastSeen)});
+  } on Exception catch (e) {
+    print(e.toString());
+  }
 }
