@@ -11,10 +11,9 @@ import 'package:messaging_app/widgets/chat_bubble.dart';
 import 'package:path/path.dart';
 
 class ConversationScreen extends StatefulWidget {
-  final conversationID, name, people;
+  final conversationID, name;
 
-  const ConversationScreen(
-      {Key key, this.conversationID, this.name, this.people})
+  const ConversationScreen({Key key, this.conversationID, this.name})
       : super(key: key);
 
   @override
@@ -118,7 +117,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
               child: StreamBuilder(
                   stream: FirebaseFirestore.instance
                       .collection('Conversations')
-                      .doc('${widget.conversationID}')
+                      .doc(widget.conversationID)
                       .collection('Messages')
                       .orderBy('timeSent', descending: true)
                       .snapshots(),
