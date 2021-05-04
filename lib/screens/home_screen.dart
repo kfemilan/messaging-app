@@ -5,6 +5,7 @@ import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
 
 import 'package:messaging_app/database/flutterfire.dart';
+import 'package:messaging_app/screens/edit_profile_screen.dart';
 import 'package:messaging_app/screens/landing_screen.dart';
 import 'package:messaging_app/screens/new_conversation.dart';
 import 'package:messaging_app/widgets/alert_dialogs.dart';
@@ -58,7 +59,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              onTap: () => ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Oops, that's still to be implemented!"))),
+              onTap: () => Navigator.push(context, MaterialPageRoute(builder: (builder) => EditProfileScreen(FirebaseAuth.instance.currentUser.uid))),
             ),
             ListTile(
               leading: Icon(Icons.logout, color: Theme.of(context).primaryColorLight),
@@ -144,7 +145,6 @@ class _HomeScreenState extends State<HomeScreen> {
                   .where("people", arrayContains: FirebaseAuth.instance.currentUser.uid)
                   .snapshots(),
               builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-                print(FirebaseAuth.instance.currentUser.uid);
                 // if (!snapshot.hasData) return Center(child: CircularProgressIndicator());
                 if (snapshot.connectionState == ConnectionState.waiting) return SizedBox(height: 0, width: 0);
                 List mappedDocs = snapshot.data.docs
@@ -156,7 +156,6 @@ class _HomeScreenState extends State<HomeScreen> {
                         })
                     .toList();
                 mappedDocs.sort((b, a) => a['latestMessageTime'].compareTo(b['latestMessageTime']));
-                print(mappedDocs.isEmpty);
                 return mappedDocs.isNotEmpty
                     ? ListView.builder(
                         itemCount: mappedDocs.length,

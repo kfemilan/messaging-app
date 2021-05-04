@@ -20,13 +20,14 @@ class _ConversationTileState extends State<ConversationTile> {
   Message latestMessage = Message(message: "Error retrieving Message", timeSent: DateTime.now(), senderId: "Error");
   String time = "Time"; // Just in case of error
   bool isSeen = false;
+  final String currentUserId = FirebaseAuth.instance.currentUser.uid;
 
   Future<String> _getDMName() async {
     if (widget.name != "") return widget.name;
     try {
       DocumentSnapshot convoSnapshot = await FirebaseFirestore.instance.collection('Conversations').doc(widget.conversationId).get();
       List<dynamic> userIds = convoSnapshot.data()['people'];
-      return (userIds[0] == FirebaseAuth.instance.currentUser.uid ? await getName(userIds[1]) : await getName(userIds[0]));
+      return (userIds[0] == currentUserId ? await getName(userIds[1]) : await getName(userIds[0]));
     } on Exception catch (e) {
       print(e.toString());
       return "Error getting name";
@@ -43,8 +44,8 @@ class _ConversationTileState extends State<ConversationTile> {
           .get();
       if (messages.size == 0) {
         // If no messages yet
-        var date =
-            (await FirebaseFirestore.instance.collection('Conversations').doc('${widget.conversationId}').get()).data()['latestMessageTime'].toDate();
+        DocumentSnapshot convoSnapshot = await FirebaseFirestore.instance.collection('Conversations').doc(widget.conversationId).get();
+        DateTime date = (convoSnapshot.data()['latestMessageTime']).toDate();
         return Message(
           message: "Start a conversation!",
           senderId: "",
@@ -66,7 +67,7 @@ class _ConversationTileState extends State<ConversationTile> {
   Future<bool> _getIsSeen(DateTime latestMessageTime) async {
     try {
       DocumentSnapshot convoSnapshot = await FirebaseFirestore.instance.collection('Conversations').doc(widget.conversationId).get();
-      DateTime userLastAccessed = convoSnapshot.data()['lastSeen'][FirebaseAuth.instance.currentUser.uid].toDate();
+      DateTime userLastAccessed = (convoSnapshot.data()['lastSeen'][currentUserId]).toDate();
       if (userLastAccessed.compareTo(latestMessageTime) >= 0) return true;
       return false;
     } on Exception catch (e) {
@@ -133,12 +134,34 @@ class _ConversationTileState extends State<ConversationTile> {
               );
               bool delSuccess = false;
               if (dismiss) delSuccess = await leaveConversation(widget.conversationId);
-              if (delSuccess) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Left conversation.')));
+              if (delSuccess)
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    behavior: SnackBarBehavior.floating,
+                    margin: EdgeInsets.only(
+                      left: MediaQuery.of(context).size.width * 0.2,
+                      right: MediaQuery.of(context).size.width * 0.2,
+                      bottom: MediaQuery.of(context).size.height * 0.5,
+                    ),
+                    content: Text("Left conversation.", textAlign: TextAlign.center),
+                  ),
+                );
             } else {
               // More
               bool editSuccess = await showDialog<bool>(
                   context: context, builder: (BuildContext context) => EditConversationAlertDialog(snapshot.data[0], widget.conversationId));
-              if (editSuccess) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Left conversation.')));
+              if (editSuccess)
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    behavior: SnackBarBehavior.floating,
+                    margin: EdgeInsets.only(
+                      left: MediaQuery.of(context).size.width * 0.2,
+                      right: MediaQuery.of(context).size.width * 0.2,
+                      bottom: MediaQuery.of(context).size.height * 0.5,
+                    ),
+                    content: Text("Conversation edited!", textAlign: TextAlign.center),
+                  ),
+                );
             }
             return dismiss;
           },
