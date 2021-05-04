@@ -7,6 +7,7 @@ import 'package:intl/intl.dart';
 import 'package:messaging_app/database/flutterfire.dart';
 import 'package:messaging_app/screens/landing_screen.dart';
 import 'package:messaging_app/screens/new_conversation.dart';
+import 'package:messaging_app/widgets/alert_dialogs.dart';
 import 'package:messaging_app/widgets/conversation_tile.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -30,9 +31,12 @@ class _HomeScreenState extends State<HomeScreen> {
           alignment: Alignment.center,
           child: IconButton(
             icon: Icon(Icons.person, color: Theme.of(context).primaryColorLight),
-            onPressed: () {
-              signOut();
-              Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => LandingScreen()));
+            onPressed: () async {
+              bool confirm = await showDialog(context: context, builder: (builder) => SignOutAlertDialog());
+              if (confirm) {
+                signOut();
+                Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => LandingScreen()));
+              }
             },
           ),
         ),
