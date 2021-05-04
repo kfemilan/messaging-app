@@ -14,9 +14,7 @@ class ChatBubble extends StatelessWidget {
   const ChatBubble({this.message, this.color});
 
   Future<String> getMemberName() async {
-    return message.senderId != FirebaseAuth.instance.currentUser.uid
-        ? await getName(message.senderId)
-        : "";
+    return message.senderId != FirebaseAuth.instance.currentUser.uid ? await getName(message.senderId) : "";
   }
 
   @override
@@ -44,9 +42,7 @@ class ChatBubble extends StatelessWidget {
         Container(
           padding: const EdgeInsets.all(10.0),
           decoration: _buildBoxDecoration(userID, context),
-          child: message.label == "text"
-              ? TextMessage(message: message, color: color)
-              : ImageMessage(message: message),
+          child: message.label == "text" ? TextMessage(message, color) : ImageMessage(message),
         ),
       ],
     );
@@ -60,8 +56,6 @@ class ChatBubble extends StatelessWidget {
           bottomLeft: Radius.circular(message.senderId == userID ? 12 : 0),
           bottomRight: Radius.circular(message.senderId == userID ? 0 : 12),
         ),
-        color: message.senderId != userID
-            ? Theme.of(context).primaryColorLight
-            : Colors.grey[300]);
+        color: message.senderId != userID ? Theme.of(context).primaryColorLight : Colors.grey[300]);
   }
 }
