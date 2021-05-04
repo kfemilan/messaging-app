@@ -5,6 +5,7 @@ import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
 
 import 'package:messaging_app/database/flutterfire.dart';
+import 'package:messaging_app/screens/edit_profile_screen.dart';
 import 'package:messaging_app/screens/landing_screen.dart';
 import 'package:messaging_app/screens/new_conversation.dart';
 import 'package:messaging_app/widgets/alert_dialogs.dart';
@@ -28,23 +29,18 @@ class _HomeScreenState extends State<HomeScreen> {
         child: ListView(
           padding: EdgeInsets.all(0),
           children: <Widget>[
-            DrawerHeader(
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  "sentence",
-                  style: TextStyle(
-                    color: Theme.of(context).primaryColor,
-                    fontSize: 30,
-                    fontFamily: 'Barlow',
-                    fontWeight: FontWeight.w900,
-                  ),
+            SizedBox(
+              height: MediaQuery.of(context).size.height * 0.2,
+              child: DrawerHeader(
+                child: Align(
+                  alignment: Alignment.center,
+                  child: Image(image: AssetImage('assets/longlogo.png'), height: MediaQuery.of(context).size.height * 0.1),
                 ),
+                decoration: BoxDecoration(color: Colors.white),
               ),
-              decoration: BoxDecoration(color: Theme.of(context).accentColor),
             ),
             ListTile(
-              leading: Icon(Icons.group, color: Colors.lime[900]),
+              leading: Icon(Icons.group, color: Theme.of(context).primaryColorLight),
               title: Text(
                 "Conversations",
                 style: TextStyle(
@@ -52,10 +48,10 @@ class _HomeScreenState extends State<HomeScreen> {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              onTap: () => false,
+              onTap: () => Navigator.push(context, MaterialPageRoute(builder: (builder) => HomeScreen())),
             ),
             ListTile(
-              leading: Icon(Icons.person, color: Colors.lime[900]),
+              leading: Icon(Icons.person, color: Theme.of(context).primaryColorLight),
               title: Text(
                 "Edit Profile",
                 style: TextStyle(
@@ -63,10 +59,10 @@ class _HomeScreenState extends State<HomeScreen> {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              onTap: () => false,
+              onTap: () => Navigator.push(context, MaterialPageRoute(builder: (builder) => EditProfileScreen(FirebaseAuth.instance.currentUser.uid))),
             ),
             ListTile(
-              leading: Icon(Icons.logout, color: Colors.lime[900]),
+              leading: Icon(Icons.logout, color: Theme.of(context).primaryColorLight),
               title: Text(
                 "Sign Out",
                 style: TextStyle(
@@ -88,22 +84,6 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         iconTheme: IconThemeData(color: Theme.of(context).primaryColorLight),
         backgroundColor: Theme.of(context).accentColor,
-        // leading: Builder(
-        //   builder: (BuildContext context) => Container(
-        //     alignment: Alignment.center,
-        //     child: IconButton(
-        //       icon: Icon(Icons.person, color: Theme.of(context).primaryColorLight),
-        //       onPressed: () async {
-        //         // Scaffold.of(context).openDrawer();
-        //         bool confirm = await showDialog(context: context, builder: (builder) => SignOutAlertDialog());
-        //         if (confirm) {
-        //           signOut();
-        //           Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => LandingScreen()));
-        //         }
-        //       },
-        //     ),
-        //   ),
-        // ),
         actions: [
           IconButton(
             icon: Icon(Icons.message, color: Theme.of(context).primaryColorLight),
@@ -165,7 +145,6 @@ class _HomeScreenState extends State<HomeScreen> {
                   .where("people", arrayContains: FirebaseAuth.instance.currentUser.uid)
                   .snapshots(),
               builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-                print(FirebaseAuth.instance.currentUser.uid);
                 // if (!snapshot.hasData) return Center(child: CircularProgressIndicator());
                 if (snapshot.connectionState == ConnectionState.waiting) return SizedBox(height: 0, width: 0);
                 List mappedDocs = snapshot.data.docs
@@ -177,7 +156,6 @@ class _HomeScreenState extends State<HomeScreen> {
                         })
                     .toList();
                 mappedDocs.sort((b, a) => a['latestMessageTime'].compareTo(b['latestMessageTime']));
-                print(mappedDocs.isEmpty);
                 return mappedDocs.isNotEmpty
                     ? ListView.builder(
                         itemCount: mappedDocs.length,

@@ -119,3 +119,24 @@ Future<void> updateSeenTimeStamp(String conversationId) async {
     print(e.toString());
   }
 }
+
+Future<Account> getAccount(String userId) async {
+  try {
+    DocumentSnapshot userSnapshot = await FirebaseFirestore.instance.collection("Users").doc(userId).get();
+    return Account(id: userId, name: userSnapshot.data()['name'], email: userSnapshot.data()['email']);
+  } on Exception catch (e) {
+    print(e.toString());
+  }
+  return Account(id: "", name: "", email: "");
+}
+
+Future<bool> updateAccount(Account updated) async {
+  try {
+    DocumentReference userRef = FirebaseFirestore.instance.collection("Users").doc(updated.id);
+    userRef.update({'name': updated.name});
+    return true;
+  } on Exception catch (e) {
+    print(e.toString());
+  }
+  return false;
+}
