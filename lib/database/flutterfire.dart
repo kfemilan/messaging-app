@@ -24,6 +24,7 @@ Future<String> register(String email, String password, String name) async {
     docRef.set({
       'name': name,
       'email': email,
+      'profilePic': '',
     });
 
     return "";
@@ -123,17 +124,33 @@ Future<void> updateSeenTimeStamp(String conversationId) async {
 Future<Account> getAccount(String userId) async {
   try {
     DocumentSnapshot userSnapshot = await FirebaseFirestore.instance.collection("Users").doc(userId).get();
-    return Account(id: userId, name: userSnapshot.data()['name'], email: userSnapshot.data()['email']);
+    return Account(
+      id: userId,
+      name: userSnapshot.data()['name'],
+      email: userSnapshot.data()['email'],
+      profilePic: userSnapshot.data()['profilePic'],
+    );
   } on Exception catch (e) {
     print(e.toString());
   }
-  return Account(id: "", name: "", email: "");
+  return Account(id: "", name: "", email: "", profilePic: "");
 }
 
-Future<bool> updateAccount(Account updated) async {
+Future<bool> updateAccountNameFirestore(String userId, String newName) async {
   try {
-    DocumentReference userRef = FirebaseFirestore.instance.collection("Users").doc(updated.id);
-    userRef.update({'name': updated.name});
+    DocumentReference userRef = FirebaseFirestore.instance.collection("Users").doc(userId);
+    userRef.update({'name': newName});
+    return true;
+  } on Exception catch (e) {
+    print(e.toString());
+  }
+  return false;
+}
+
+Future<bool> updateAccountProfilePictureFirestore(String userId, String newProfPic) async {
+  try {
+    DocumentReference userRef = FirebaseFirestore.instance.collection("Users").doc(userId);
+    userRef.update({'profilePic': newProfPic});
     return true;
   } on Exception catch (e) {
     print(e.toString());
