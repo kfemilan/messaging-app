@@ -1,18 +1,21 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:messaging_app/database/authentication_exceptions.dart';
 import 'package:messaging_app/models/Account.dart';
 
-Future<bool> signIn(String email, String password) async {
+
+
+Future<String> signIn(String email, String password) async {
   try {
     await FirebaseAuth.instance.signInWithEmailAndPassword(email: email, password: password);
-    return true;
+    return "";
   } catch (e) {
-    print(e);
-    return false;
+    var message = AuthenticationExceptions.generateMessage(AuthenticationExceptions.handleException(e));
+    return message;
   }
 }
 
-Future<bool> register(String email, String password, String name) async {
+Future<String> register(String email, String password, String name) async {
   try {
     await FirebaseAuth.instance.createUserWithEmailAndPassword(email: email, password: password);
 
@@ -23,17 +26,10 @@ Future<bool> register(String email, String password, String name) async {
       'email': email,
     });
 
-    return true;
-  } on FirebaseAuthException catch (e) {
-    if (e.code == 'weak-password') {
-      print('The Password provided is too weak');
-    } else if (e.code == 'email-already-in-use') {
-      print('The Email is already in use!');
-    }
-    return false;
+    return "";
   } catch (e) {
-    print(e.toString());
-    return false;
+    var message = AuthenticationExceptions.generateMessage(AuthenticationExceptions.handleException(e));
+    return message;
   }
 }
 
