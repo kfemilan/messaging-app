@@ -4,6 +4,33 @@ import 'package:flutter/material.dart';
 import 'package:messaging_app/models/Constants.dart';
 
 // Separated since it was getting a bit too unreadable
+class SignOutAlertDialog extends StatelessWidget {
+  const SignOutAlertDialog({Key key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      title: Text("Sign out?", style: Theme.of(context).textTheme.headline3),
+      actions: <Widget>[
+        TextButton(
+          child: Text("No", style: TextStyle(color: Colors.grey)),
+          onPressed: () => Navigator.of(context).pop(false),
+        ),
+        Container(
+          padding: EdgeInsets.symmetric(horizontal: 10),
+          decoration: BoxDecoration(borderRadius: BorderRadius.circular(10), color: Theme.of(context).primaryColorLight),
+          child: TextButton(
+            style: TextButton.styleFrom(backgroundColor: primaryLight),
+            child: Text("Yes", style: TextStyle(color: Colors.white)),
+            onPressed: () => Navigator.of(context).pop(true),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
 class DeleteConversationAlertDialog extends StatelessWidget {
   const DeleteConversationAlertDialog({Key key}) : super(key: key);
 
@@ -41,11 +68,9 @@ class EditConversationAlertDialog extends StatefulWidget {
 class _EditConversationAlertDialogState extends State<EditConversationAlertDialog> {
   @override
   Widget build(BuildContext context) {
-    TextEditingController _convoNameController =
-        new TextEditingController(text: "Conversation Name");
+    TextEditingController _convoNameController = new TextEditingController(text: "Conversation Name");
     _convoNameController.text = widget.convoName;
-    _convoNameController.selection = TextSelection.fromPosition(
-        TextPosition(offset: _convoNameController.text.length));
+    _convoNameController.selection = TextSelection.fromPosition(TextPosition(offset: _convoNameController.text.length));
     return AlertDialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
       title: Text(
@@ -76,9 +101,7 @@ class _EditConversationAlertDialogState extends State<EditConversationAlertDialo
                   borderRadius: BorderRadius.circular(15.0),
                 ),
                 errorStyle: Theme.of(context).textTheme.subtitle2,
-                errorBorder: OutlineInputBorder(
-                    borderSide: BorderSide(width: 1, color: Colors.red),
-                    borderRadius: BorderRadius.circular(15.0)),
+                errorBorder: OutlineInputBorder(borderSide: BorderSide(width: 1, color: Colors.red), borderRadius: BorderRadius.circular(15.0)),
                 suffixIcon: IconButton(
                   icon: Icon(Icons.clear_rounded),
                   onPressed: () {
@@ -97,20 +120,14 @@ class _EditConversationAlertDialogState extends State<EditConversationAlertDialo
         ),
         Container(
           padding: EdgeInsets.symmetric(horizontal: 5),
-          decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(10),
-              color: Theme.of(context).primaryColorLight),
+          decoration: BoxDecoration(borderRadius: BorderRadius.circular(10), color: Theme.of(context).primaryColorLight),
           child: TextButton(
             style: TextButton.styleFrom(backgroundColor: primaryLight),
             child: Text("Confirm", style: TextStyle(color: Colors.white)),
             onPressed: () {
               print(_convoNameController.text);
-              if (_convoNameController.text.isEmpty)
-                Navigator.of(context).pop(false);
-              FirebaseFirestore.instance
-                  .collection("Conversations")
-                  .doc(widget.conversationId)
-                  .update({'name': _convoNameController.text});
+              if (_convoNameController.text.isEmpty) Navigator.of(context).pop(false);
+              FirebaseFirestore.instance.collection("Conversations").doc(widget.conversationId).update({'name': _convoNameController.text});
               Navigator.of(context).pop(true);
             },
           ),

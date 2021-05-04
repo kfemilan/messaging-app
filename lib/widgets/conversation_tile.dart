@@ -67,11 +67,6 @@ class _ConversationTileState extends State<ConversationTile> {
     try {
       DocumentSnapshot convoSnapshot = await FirebaseFirestore.instance.collection('Conversations').doc(widget.conversationId).get();
       DateTime userLastAccessed = convoSnapshot.data()['lastSeen'][FirebaseAuth.instance.currentUser.uid].toDate();
-      print("====");
-      print(userLastAccessed);
-      print(latestMessageTime);
-      // DateTime lastSeen = convoSnapshot.data()['lastSeen'][FirebaseAuth.instance.currentUser.uid];
-      // print(lastSeen);
       if (userLastAccessed.compareTo(latestMessageTime) >= 0) return true;
       return false;
     } on Exception catch (e) {
@@ -142,9 +137,9 @@ class _ConversationTileState extends State<ConversationTile> {
               if (delSuccess) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Left conversation.')));
             } else {
               // More
-              print("More");
-              bool edit = await showDialog<bool>(
+              bool editSuccess = await showDialog<bool>(
                   context: context, builder: (BuildContext context) => EditConversationAlertDialog(snapshot.data[0], widget.conversationId));
+              if (editSuccess) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Left conversation.')));
             }
             return dismiss;
           },
