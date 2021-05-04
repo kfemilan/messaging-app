@@ -160,9 +160,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ? ListView.builder(
                         itemCount: mappedDocs.length,
                         itemBuilder: (BuildContext context, index) {
-                          return mappedDocs[index]['name'].toLowerCase().contains(_searchConvo.value.text.toLowerCase())
-                              ? ConversationTile(mappedDocs[index]['convoId'], mappedDocs[index]['name'])
-                              : SizedBox(width: 0, height: 0);
+                          return ConversationTile(mappedDocs[index]['convoId'], mappedDocs[index]['name'], _searchConvo.text.toLowerCase());
                         })
                     : Container(
                         width: MediaQuery.of(context).size.width * 0.9,

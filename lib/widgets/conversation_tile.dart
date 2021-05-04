@@ -9,8 +9,8 @@ import 'package:messaging_app/database/flutterfire.dart';
 import 'package:messaging_app/widgets/alert_dialogs.dart';
 
 class ConversationTile extends StatefulWidget {
-  const ConversationTile(this.conversationId, this.name, {Key key}) : super(key: key);
-  final String name, conversationId;
+  const ConversationTile(this.conversationId, this.name, this.searchFilter, {Key key}) : super(key: key);
+  final String name, conversationId, searchFilter;
   @override
   _ConversationTileState createState() => _ConversationTileState();
 }
@@ -100,6 +100,7 @@ class _ConversationTileState extends State<ConversationTile> {
       builder: (context, snapshot) {
         if (!snapshot.hasData) return SizedBox(height: 0, width: 0);
         // Once latest message is retrieved
+        if (!snapshot.data['convoName'].toLowerCase().contains(widget.searchFilter)) return SizedBox(height: 0, width: 0);
         latestMessage = snapshot.data['message'];
         isSeen = snapshot.data['isSeen'];
 
