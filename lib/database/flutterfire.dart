@@ -140,7 +140,7 @@ Future<Account> getAccount(String userId) async {
   return Account(id: "", name: "", email: "", profilePic: "");
 }
 
-Future<bool> updateAccountName(String userId, String newName) async {
+Future<bool> updateAccountNameFirestore(String userId, String newName) async {
   try {
     DocumentReference userRef = FirebaseFirestore.instance.collection("Users").doc(userId);
     userRef.update({'name': newName});
@@ -151,7 +151,7 @@ Future<bool> updateAccountName(String userId, String newName) async {
   return false;
 }
 
-Future<bool> updateAccountProfilePicture(String userId, String newProfPic) async {
+Future<bool> updateAccountProfilePictureFirestore(String userId, String newProfPic) async {
   try {
     DocumentReference userRef = FirebaseFirestore.instance.collection("Users").doc(userId);
     userRef.update({'profilePic': newProfPic});

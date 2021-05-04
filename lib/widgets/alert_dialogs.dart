@@ -3,6 +3,28 @@ import 'package:flutter/material.dart';
 
 import 'package:messaging_app/models/Constants.dart';
 
+class PictureSourceSimpleDialog extends StatelessWidget {
+  const PictureSourceSimpleDialog({Key key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return SimpleDialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      title: Text("Select source for image:", style: TextStyle(color: Colors.black)),
+      children: <Widget>[
+        SimpleDialogOption(
+          child: Padding(padding: EdgeInsets.symmetric(vertical: 10.0), child: Text('Camera', style: TextStyle(color: Colors.black))),
+          onPressed: () => Navigator.pop(context, "Camera"),
+        ),
+        SimpleDialogOption(
+          child: Padding(padding: EdgeInsets.symmetric(vertical: 10.0), child: Text('Gallery', style: TextStyle(color: Colors.black))),
+          onPressed: () => Navigator.pop(context, "Gallery"),
+        ),
+      ],
+    );
+  }
+}
+
 // Separated since it was getting a bit too unreadable
 class SignOutAlertDialog extends StatelessWidget {
   const SignOutAlertDialog({Key key}) : super(key: key);
