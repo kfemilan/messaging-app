@@ -11,7 +11,7 @@ class DeleteConversationAlertDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     return AlertDialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-      title: Text("Leave Conversation?", style: Theme.of(context).textTheme.bodyText1),
+      title: Text("Leave Conversation?", style: Theme.of(context).textTheme.headline3),
       actions: <Widget>[
         TextButton(
           child: Text("No", style: TextStyle(color: Colors.grey)),
@@ -19,7 +19,7 @@ class DeleteConversationAlertDialog extends StatelessWidget {
         ),
         Container(
           padding: EdgeInsets.symmetric(horizontal: 10),
-          decoration: BoxDecoration(borderRadius: BorderRadius.circular(5), color: Theme.of(context).primaryColorLight),
+          decoration: BoxDecoration(borderRadius: BorderRadius.circular(10), color: Theme.of(context).primaryColorLight),
           child: TextButton(
             style: TextButton.styleFrom(backgroundColor: primaryLight),
             child: Text("Yes", style: TextStyle(color: Colors.white)),
@@ -41,28 +41,50 @@ class EditConversationAlertDialog extends StatefulWidget {
 class _EditConversationAlertDialogState extends State<EditConversationAlertDialog> {
   @override
   Widget build(BuildContext context) {
-    TextEditingController _convoNameController = new TextEditingController(text: "Conversation Name");
+    TextEditingController _convoNameController =
+        new TextEditingController(text: "Conversation Name");
     _convoNameController.text = widget.convoName;
+    _convoNameController.selection = TextSelection.fromPosition(
+        TextPosition(offset: _convoNameController.text.length));
     return AlertDialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
       title: Text(
-        "Edit Conversation",
-        style: TextStyle(color: Theme.of(context).primaryColorDark, fontSize: 20.0),
+        "Edit Conversation Name",
+        style: Theme.of(context).textTheme.headline3,
       ),
       content: Container(
         width: MediaQuery.of(context).size.width,
-        height: MediaQuery.of(context).size.height * 0.2,
+        height: MediaQuery.of(context).size.height * 0.1,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            Text("Conversation Name", style: TextStyle(fontSize: 16.0)),
             TextFormField(
               controller: _convoNameController,
-              style: TextStyle(color: Colors.black, fontSize: 14.0),
+              style: Theme.of(context).textTheme.bodyText2,
               decoration: InputDecoration(
-                border: InputBorder.none,
-                hintText: "Conversation Name",
-                hintStyle: TextStyle(color: Colors.grey, fontSize: 14.0),
+                filled: true,
+                fillColor: Theme.of(context).primaryColorLight,
+                border: OutlineInputBorder(
+                  borderSide: BorderSide.none,
+                  borderRadius: BorderRadius.circular(15.0),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(
+                    width: 1,
+                    color: Theme.of(context).accentColor,
+                  ),
+                  borderRadius: BorderRadius.circular(15.0),
+                ),
+                errorStyle: Theme.of(context).textTheme.subtitle2,
+                errorBorder: OutlineInputBorder(
+                    borderSide: BorderSide(width: 1, color: Colors.red),
+                    borderRadius: BorderRadius.circular(15.0)),
+                suffixIcon: IconButton(
+                  icon: Icon(Icons.clear_rounded),
+                  onPressed: () {
+                    _convoNameController.text = "";
+                  },
+                ),
               ),
             ),
           ],
@@ -74,22 +96,22 @@ class _EditConversationAlertDialogState extends State<EditConversationAlertDialo
           onPressed: () => Navigator.of(context).pop(false),
         ),
         Container(
-          padding: EdgeInsets.symmetric(horizontal: 10),
-          decoration: BoxDecoration(borderRadius: BorderRadius.circular(5), color: Theme.of(context).primaryColorLight),
+          padding: EdgeInsets.symmetric(horizontal: 5),
+          decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(10),
+              color: Theme.of(context).primaryColorLight),
           child: TextButton(
             style: TextButton.styleFrom(backgroundColor: primaryLight),
-            child: Text("Confirm Changes", style: TextStyle(color: Colors.white)),
+            child: Text("Confirm", style: TextStyle(color: Colors.white)),
             onPressed: () {
-              if (_convoNameController.text.isEmpty) Navigator.of(context).pop(false);
-              try {
-                FirebaseFirestore.instance.collection("Conversations").doc(widget.conversationId).update({'name': _convoNameController.text});
-                Navigator.of(context).pop(true);
-              } on Exception catch (e) {
-                print(e.toString());
+              print(_convoNameController.text);
+              if (_convoNameController.text.isEmpty)
                 Navigator.of(context).pop(false);
-              }
-              Navigator.of(context).pop(false);
-              this.dispose();
+              FirebaseFirestore.instance
+                  .collection("Conversations")
+                  .doc(widget.conversationId)
+                  .update({'name': _convoNameController.text});
+              Navigator.of(context).pop(true);
             },
           ),
         ),
