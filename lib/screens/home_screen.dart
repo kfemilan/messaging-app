@@ -24,22 +24,86 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // drawer: Drawer(),
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).accentColor,
-        leading: Container(
-          alignment: Alignment.center,
-          child: IconButton(
-            icon: Icon(Icons.person, color: Theme.of(context).primaryColorLight),
-            onPressed: () async {
-              bool confirm = await showDialog(context: context, builder: (builder) => SignOutAlertDialog());
-              if (confirm) {
-                signOut();
-                Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => LandingScreen()));
-              }
-            },
-          ),
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.all(0),
+          children: <Widget>[
+            DrawerHeader(
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  "sentence",
+                  style: TextStyle(
+                    color: Theme.of(context).primaryColor,
+                    fontSize: 30,
+                    fontFamily: 'Barlow',
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+              ),
+              decoration: BoxDecoration(color: Theme.of(context).accentColor),
+            ),
+            ListTile(
+              leading: Icon(Icons.group, color: Colors.lime[900]),
+              title: Text(
+                "Conversations",
+                style: TextStyle(
+                  fontSize: 20.0,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              onTap: () => false,
+            ),
+            ListTile(
+              leading: Icon(Icons.person, color: Colors.lime[900]),
+              title: Text(
+                "Edit Profile",
+                style: TextStyle(
+                  fontSize: 20.0,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              onTap: () => false,
+            ),
+            ListTile(
+              leading: Icon(Icons.logout, color: Colors.lime[900]),
+              title: Text(
+                "Sign Out",
+                style: TextStyle(
+                  fontSize: 20.0,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              onTap: () async {
+                bool confirm = await showDialog(context: context, builder: (builder) => SignOutAlertDialog());
+                if (confirm) {
+                  signOut();
+                  Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => LandingScreen()));
+                }
+              },
+            )
+          ],
         ),
+      ),
+      appBar: AppBar(
+        iconTheme: IconThemeData(color: Theme.of(context).primaryColorLight),
+        backgroundColor: Theme.of(context).accentColor,
+        // leading: Builder(
+        //   builder: (BuildContext context) => Container(
+        //     alignment: Alignment.center,
+        //     child: IconButton(
+        //       icon: Icon(Icons.person, color: Theme.of(context).primaryColorLight),
+        //       onPressed: () async {
+        //         // Scaffold.of(context).openDrawer();
+        //         bool confirm = await showDialog(context: context, builder: (builder) => SignOutAlertDialog());
+        //         if (confirm) {
+        //           signOut();
+        //           Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => LandingScreen()));
+        //         }
+        //       },
+        //     ),
+        //   ),
+        // ),
         actions: [
           IconButton(
             icon: Icon(Icons.message, color: Theme.of(context).primaryColorLight),
@@ -160,7 +224,11 @@ class _HomeScreenState extends State<HomeScreen> {
                                       backgroundColor: MaterialStateProperty.all(Theme.of(context).primaryColorLight),
                                       shape: MaterialStateProperty.all<RoundedRectangleBorder>(
                                         RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(14.0),
+                                          borderRadius: BorderRadius.only(
+                                            topLeft: Radius.circular(14.0),
+                                            topRight: Radius.circular(14.0),
+                                            bottomLeft: Radius.circular(14.0),
+                                          ),
                                         ),
                                       ),
                                     ),
