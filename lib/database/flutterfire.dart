@@ -3,24 +3,26 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:messaging_app/database/authentication_exceptions.dart';
 import 'package:messaging_app/models/Account.dart';
 
-
-
 Future<String> signIn(String email, String password) async {
   try {
-    await FirebaseAuth.instance.signInWithEmailAndPassword(email: email, password: password);
+    await FirebaseAuth.instance
+        .signInWithEmailAndPassword(email: email, password: password);
     return "";
   } catch (e) {
-    var message = AuthenticationExceptions.generateMessage(AuthenticationExceptions.handleException(e));
+    var message = AuthenticationExceptions.generateMessage(
+        AuthenticationExceptions.handleException(e));
     return message;
   }
 }
 
 Future<String> register(String email, String password, String name) async {
   try {
-    await FirebaseAuth.instance.createUserWithEmailAndPassword(email: email, password: password);
+    await FirebaseAuth.instance
+        .createUserWithEmailAndPassword(email: email, password: password);
 
     String uID = FirebaseAuth.instance.currentUser.uid;
-    DocumentReference docRef = FirebaseFirestore.instance.collection('Users').doc(uID);
+    DocumentReference docRef =
+        FirebaseFirestore.instance.collection('Users').doc(uID);
     docRef.set({
       'name': name,
       'email': email,
@@ -29,7 +31,8 @@ Future<String> register(String email, String password, String name) async {
 
     return "";
   } catch (e) {
-    var message = AuthenticationExceptions.generateMessage(AuthenticationExceptions.handleException(e));
+    var message = AuthenticationExceptions.generateMessage(
+        AuthenticationExceptions.handleException(e));
     return message;
   }
 }
@@ -54,14 +57,19 @@ Future<String> createConversation(List<Account> users, String name) async {
     userIDs.add(uID);
     userIDs.sort();
 
-    QuerySnapshot x = await FirebaseFirestore.instance.collection("Conversations").where("people", isEqualTo: userIDs).get();
+    QuerySnapshot x = await FirebaseFirestore.instance
+        .collection("Conversations")
+        .where("people", isEqualTo: userIDs)
+        .get();
     print(x.size);
     if (x.size != 0) {
       return x.docs[0].id;
     }
 
-    Map lastSeenMap = Map.fromIterable(userIDs, key: (uid) => uid, value: (uid) => DateTime.now());
-    DocumentReference conRef = await FirebaseFirestore.instance.collection('Conversations').add({
+    Map lastSeenMap = Map.fromIterable(userIDs,
+        key: (uid) => uid, value: (uid) => DateTime.now());
+    DocumentReference conRef =
+        await FirebaseFirestore.instance.collection('Conversations').add({
       'name': name,
       'people': userIDs,
       'latestMessageTime': DateTime.now(),
@@ -77,7 +85,8 @@ Future<String> createConversation(List<Account> users, String name) async {
 
 Future<String> getName(String userId) async {
   try {
-    DocumentSnapshot userSnapshot = await FirebaseFirestore.instance.collection('Users').doc(userId).get();
+    DocumentSnapshot userSnapshot =
+        await FirebaseFirestore.instance.collection('Users').doc(userId).get();
     String name = userSnapshot.data()['name'] as String;
     return name;
   } on Exception catch (e) {
@@ -89,16 +98,25 @@ Future<String> getName(String userId) async {
 Future<bool> leaveConversation(String conversationId) async {
   try {
     // await FirebaseFirestore.instance.collection('Conversations').doc(conversationId).delete();
-    DocumentSnapshot convoSnapshot = await FirebaseFirestore.instance.collection('Conversations').doc(conversationId).get();
+    DocumentSnapshot convoSnapshot = await FirebaseFirestore.instance
+        .collection('Conversations')
+        .doc(conversationId)
+        .get();
     List<dynamic> people = convoSnapshot.data()['people'];
 
     if (people.length <= 2) // If only two people are in the convo
-      await FirebaseFirestore.instance.collection('Conversations').doc(conversationId).delete();
+      await FirebaseFirestore.instance
+          .collection('Conversations')
+          .doc(conversationId)
+          .delete();
     else {
       // If Group chat
-      DocumentReference convoRef = FirebaseFirestore.instance.collection('Conversations').doc(conversationId);
+      DocumentReference convoRef = FirebaseFirestore.instance
+          .collection('Conversations')
+          .doc(conversationId);
       convoRef.update({
-        'people': FieldValue.arrayRemove([FirebaseAuth.instance.currentUser.uid])
+        'people':
+            FieldValue.arrayRemove([FirebaseAuth.instance.currentUser.uid])
       });
     }
     return true;
@@ -110,12 +128,16 @@ Future<bool> leaveConversation(String conversationId) async {
 
 Future<void> updateSeenTimeStamp(String conversationId) async {
   try {
-    DocumentSnapshot convoSnapshot = await FirebaseFirestore.instance.collection('Conversations').doc(conversationId).get();
+    DocumentSnapshot convoSnapshot = await FirebaseFirestore.instance
+        .collection('Conversations')
+        .doc(conversationId)
+        .get();
     Map<String, dynamic> everyoneLastSeen = convoSnapshot.data()['lastSeen'];
-    print(everyoneLastSeen);
     everyoneLastSeen[FirebaseAuth.instance.currentUser.uid] = DateTime.now();
-    print(everyoneLastSeen);
-    await FirebaseFirestore.instance.collection("Conversations").doc(conversationId).update({'lastSeen': (everyoneLastSeen)});
+    await FirebaseFirestore.instance
+        .collection("Conversations")
+        .doc(conversationId)
+        .update({'lastSeen': (everyoneLastSeen)});
   } on Exception catch (e) {
     print(e.toString());
   }
@@ -123,7 +145,8 @@ Future<void> updateSeenTimeStamp(String conversationId) async {
 
 Future<Account> getAccount(String userId) async {
   try {
-    DocumentSnapshot userSnapshot = await FirebaseFirestore.instance.collection("Users").doc(userId).get();
+    DocumentSnapshot userSnapshot =
+        await FirebaseFirestore.instance.collection("Users").doc(userId).get();
     return Account(
       id: userId,
       name: userSnapshot.data()['name'],
@@ -138,7 +161,8 @@ Future<Account> getAccount(String userId) async {
 
 Future<bool> updateAccountNameFirestore(String userId, String newName) async {
   try {
-    DocumentReference userRef = FirebaseFirestore.instance.collection("Users").doc(userId);
+    DocumentReference userRef =
+        FirebaseFirestore.instance.collection("Users").doc(userId);
     userRef.update({'name': newName});
     return true;
   } on Exception catch (e) {
@@ -147,9 +171,11 @@ Future<bool> updateAccountNameFirestore(String userId, String newName) async {
   return false;
 }
 
-Future<bool> updateAccountProfilePictureFirestore(String userId, String newProfPic) async {
+Future<bool> updateAccountProfilePictureFirestore(
+    String userId, String newProfPic) async {
   try {
-    DocumentReference userRef = FirebaseFirestore.instance.collection("Users").doc(userId);
+    DocumentReference userRef =
+        FirebaseFirestore.instance.collection("Users").doc(userId);
     userRef.update({'profilePic': newProfPic});
     return true;
   } on Exception catch (e) {

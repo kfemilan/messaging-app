@@ -61,6 +61,33 @@ class _ConversationScreenState extends State<ConversationScreen> {
     });
   }
 
+  Future<List> getMembers() async {
+    final conRef = await FirebaseFirestore.instance
+        .collection('Conversations')
+        .doc(widget.conversationID)
+        .get();
+    return conRef.data()['people'];
+  }
+
+  Future<String> getTimeDifference() async {
+    final members = await getMembers();
+    final gg = await FirebaseFirestore.instance
+        .collection('Conversations')
+        .doc(widget.conversationID)
+        .get();
+    DateTime latestSeenTime;
+    members.removeWhere((id) => id == userID);
+    latestSeenTime = gg.data()['lastSeen'][members[0]].toDate();
+    for (int i = 1; i < members.length; i++) {
+      if (latestSeenTime.isBefore(gg.data()['lastSeen'][members[i]].toDate())) {
+        print("YES");
+        latestSeenTime = gg.data()['lastSeen'][members[i]].toDate();
+      }
+    }
+    print(latestSeenTime);
+    return DateTime.now().difference(latestSeenTime).inSeconds.toString();
+  }
+
   @override
   Widget build(BuildContext context) {
     void _sendMessage() async {
@@ -91,6 +118,23 @@ class _ConversationScreenState extends State<ConversationScreen> {
       dataSent = "text";
     }
 
+    String _getTimeLabel(int seconds) {
+      // Seconds
+      if (seconds > 60) {
+        int time = seconds ~/ 60;
+        // Minutes
+        if (time > 60) {
+          time ~/= 60;
+          // Hours and Days
+          return time > 24
+              ? "${(time ~/ 24).toString()} day(s)"
+              : "${time.toString()} hour(s)";
+        } else
+          return "${time.toString()} minute(s)";
+      } else
+        return "${seconds.toString()} second(s)";
+    }
+
     return Scaffold(
         appBar: AppBar(
           elevation: 0.0,
@@ -98,13 +142,22 @@ class _ConversationScreenState extends State<ConversationScreen> {
           title: Column(
             children: [
               Text(widget.name, style: Theme.of(context).textTheme.headline6),
-              Text("Seen 1 hour ago",
-                  style: Theme.of(context).textTheme.headline6),
+              FutureBuilder(
+                  future: getTimeDifference(),
+                  builder: (_, snapshot) {
+                    return !snapshot.hasData
+                        ? SizedBox()
+                        : Text(
+                            "Seen ${_getTimeLabel(int.parse(snapshot.data))} ago",
+                            style: Theme.of(context).textTheme.headline6);
+                  })
             ],
           ),
           actions: [
             IconButton(
-              onPressed: () {},
+              onPressed: () {
+                print(getTimeDifference());
+              },
               icon: Image.network(kDefaultProfilePicture),
             )
           ],
