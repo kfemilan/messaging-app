@@ -97,9 +97,6 @@ class _ConversationTileState extends State<ConversationTile> {
     return FutureBuilder(
       future: _retrieveData(),
       builder: (context, snapshot) {
-        // Name of Convo is at index 0
-        // Message is at index 1
-        // Seen is at index 2
         if (!snapshot.hasData) return SizedBox(height: 0, width: 0);
         // Once latest message is retrieved
         latestMessage = snapshot.data['message'];
@@ -116,12 +113,14 @@ class _ConversationTileState extends State<ConversationTile> {
           key: Key(widget.conversationId.toString()),
           background: Container(
             alignment: Alignment.centerLeft,
-            margin: EdgeInsets.only(left: 20.0),
+            padding: EdgeInsets.only(left: 20.0),
+            color: Theme.of(context).primaryColorDark,
             child: Icon(Icons.more, color: Theme.of(context).primaryColorLight, size: 30),
           ),
           secondaryBackground: Container(
             alignment: Alignment.centerRight,
-            margin: EdgeInsets.only(right: 20.0),
+            padding: EdgeInsets.only(right: 20.0),
+            color: Theme.of(context).primaryColorDark,
             child: Icon(Icons.delete, color: Theme.of(context).primaryColorLight, size: 30),
           ),
           confirmDismiss: (direction) async {
