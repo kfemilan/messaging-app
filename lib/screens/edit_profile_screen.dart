@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -30,8 +31,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   String dataSent = "text"; // Either text or image
 
   Future getImage(String option) async {
-    final pickedFile = await picker.getImage(
-        source: option == "Camera" ? ImageSource.camera : ImageSource.gallery);
+    final pickedFile = await picker.getImage(source: option == "Camera" ? ImageSource.camera : ImageSource.gallery);
 
     setState(() {
       if (pickedFile != null) {
@@ -54,8 +54,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             icon: Icon(Icons.save),
             onPressed: () async {
               bool success = false;
-              if (isUsingLocalImage)
-                success = await updateAccountProfilePicture(context);
+              if (isUsingLocalImage) success = await updateAccountProfilePicture(context);
               if (success) setState(() {});
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
@@ -65,9 +64,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     right: MediaQuery.of(context).size.width * 0.2,
                     bottom: MediaQuery.of(context).size.height * 0.5,
                   ),
-                  content: Text(
-                      success ? "Everything went A-OK!" : "Oops, try again.",
-                      textAlign: TextAlign.center),
+                  content: Text(success ? "Everything went A-OK!" : "Oops, try again.", textAlign: TextAlign.center),
                 ),
               );
             },
@@ -83,8 +80,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             retrievedAccount.email = accountSnapshot.data.email;
             retrievedAccount.profilePic = accountSnapshot.data.profilePic;
             _usernameController.text = retrievedAccount.name;
-            _usernameController.selection = TextSelection.fromPosition(
-                TextPosition(offset: _usernameController.text.length));
+            _usernameController.selection = TextSelection.fromPosition(TextPosition(offset: _usernameController.text.length));
 
             return Container(
               alignment: Alignment.center,
@@ -100,17 +96,14 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         CircleAvatar(
                           backgroundColor: Theme.of(context).primaryColorLight,
                           maxRadius: MediaQuery.of(context).size.width * 0.3,
-                          backgroundImage:
-                              !isUsingLocalImage // If not using local image, use retrieved
-                                  ? (retrievedAccount.profilePic.isEmpty
-                                      ? AssetImage('assets/defaultpp.jpg')
-                                      : NetworkImage(
-                                          retrievedAccount.profilePic))
-                                  : (_image != null
-                                      ? Image.file(_image, fit: BoxFit.cover)
-                                          .image
-                                      : AssetImage(
-                                          'assets/defaultpp.jpg')), // Else, use local
+                          backgroundImage: retrievedAccount.profilePic.isEmpty ? AssetImage('assets/defaultpp.jpg') : null,
+                          foregroundImage: !isUsingLocalImage // If not using local image, use retrieved
+                              ? (retrievedAccount.profilePic.isEmpty
+                                  ? AssetImage('assets/defaultpp.jpg')
+                                  : CachedNetworkImageProvider(retrievedAccount.profilePic))
+                              : (_image != null
+                                  ? Image.file(_image, fit: BoxFit.cover).image
+                                  : AssetImage('assets/defaultpp.jpg')), // Else, use local
                         ),
                         Container(
                           alignment: Alignment.topRight,
@@ -126,10 +119,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                             onPressed: () async {
                               bool success = false;
                               try {
-                                String imgSrc = await showDialog(
-                                    context: context,
-                                    builder: (BuildContext context) =>
-                                        PictureSourceSimpleDialog());
+                                String imgSrc = await showDialog(context: context, builder: (BuildContext context) => PictureSourceSimpleDialog());
                                 getImage(imgSrc);
                                 success = true;
                               } on Exception catch (e) {
@@ -139,18 +129,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                 SnackBar(
                                   behavior: SnackBarBehavior.floating,
                                   margin: EdgeInsets.only(
-                                    left:
-                                        MediaQuery.of(context).size.width * 0.2,
-                                    right:
-                                        MediaQuery.of(context).size.width * 0.2,
-                                    bottom: MediaQuery.of(context).size.height *
-                                        0.5,
+                                    left: MediaQuery.of(context).size.width * 0.2,
+                                    right: MediaQuery.of(context).size.width * 0.2,
+                                    bottom: MediaQuery.of(context).size.height * 0.5,
                                   ),
-                                  content: Text(
-                                      success
-                                          ? "Image loaded successfully."
-                                          : "Oops, try again.",
-                                      textAlign: TextAlign.center),
+                                  content: Text(success ? "Image loaded successfully." : "Oops, try again.", textAlign: TextAlign.center),
                                 ),
                               );
                             },
@@ -170,13 +153,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           enabled: isEditing,
                           controller: _usernameController,
                           textCapitalization: TextCapitalization.sentences,
-                          style:
-                              TextStyle(color: Theme.of(context).accentColor),
+                          style: TextStyle(color: Theme.of(context).accentColor),
                           decoration: InputDecoration(
                               filled: true,
-                              fillColor: isEditing
-                                  ? Theme.of(context).primaryColorLight
-                                  : Colors.grey,
+                              fillColor: isEditing ? Theme.of(context).primaryColorLight : Colors.grey,
                               border: OutlineInputBorder(
                                 borderSide: BorderSide.none,
                                 borderRadius: BorderRadius.circular(15.0),
@@ -189,10 +169,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                 borderRadius: BorderRadius.circular(15.0),
                               ),
                               errorStyle: Theme.of(context).textTheme.subtitle2,
-                              errorBorder: OutlineInputBorder(
-                                  borderSide:
-                                      BorderSide(width: 1, color: Colors.red),
-                                  borderRadius: BorderRadius.circular(15.0)),
+                              errorBorder:
+                                  OutlineInputBorder(borderSide: BorderSide(width: 1, color: Colors.red), borderRadius: BorderRadius.circular(15.0)),
                               suffixIcon: IconButton(
                                 icon: Icon(Icons.close_rounded),
                                 onPressed: () {
@@ -202,17 +180,14 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         ),
                       ),
                       IconButton(
-                          icon: Icon(isEditing ? Icons.check : Icons.edit,
-                              color: editIcon, size: 30),
+                          icon: Icon(isEditing ? Icons.check : Icons.edit, color: editIcon, size: 30),
                           onPressed: () async {
                             if (isEditing && _usernameController.text != "") {
-                              await updateAccountName(context,
-                                  widget.userId, _usernameController.text);
+                              await updateAccountName(context, widget.userId, _usernameController.text);
                             }
                             setState(() {
                               isEditing = !isEditing;
-                              editIcon = (editIcon !=
-                                      Theme.of(context).primaryColorLight)
+                              editIcon = (editIcon != Theme.of(context).primaryColorLight)
                                   ? Theme.of(context).primaryColorLight
                                   : Theme.of(context).primaryColorDark;
                             });
@@ -225,9 +200,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     alignment: Alignment.centerLeft,
                     height: MediaQuery.of(context).size.height * 0.07,
                     width: MediaQuery.of(context).size.width * 0.8,
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.all(Radius.circular(15)),
-                        color: Theme.of(context).primaryColor),
+                    decoration: BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(15)), color: Theme.of(context).primaryColor),
                     child: FittedBox(
                       child: Text(
                         retrievedAccount.email,
@@ -252,10 +225,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       final _firebaseStorage = firebase_storage.FirebaseStorage.instance;
       if (_image != null) {
         //Upload to Firebase
-        var snapshot = await _firebaseStorage
-            .ref()
-            .child('${widget.userId}/$imgName')
-            .putFile(_image);
+        var snapshot = await _firebaseStorage.ref().child('${widget.userId}/$imgName').putFile(_image);
         // Get image from firebase
         String downloadUrl = await snapshot.ref.getDownloadURL();
         updateAccountProfilePictureFirestore(widget.userId, downloadUrl);
@@ -280,18 +250,14 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           right: MediaQuery.of(context).size.width * 0.2,
           bottom: MediaQuery.of(context).size.height * 0.5,
         ),
-        content: Text(
-            success
-                ? "Account picture updated successfully!"
-                : "Oops, something bad happened! Try uploading your selfies next time.",
+        content: Text(success ? "Account picture updated successfully!" : "Oops, something bad happened! Try uploading your selfies next time.",
             textAlign: TextAlign.center),
       ),
     );
     return success;
   }
 
-  Future<bool> updateAccountName(
-      BuildContext context, String userId, String newUsername) async {
+  Future<bool> updateAccountName(BuildContext context, String userId, String newUsername) async {
     bool success = true;
     if (_usernameController.text == retrievedAccount.name) {
       // No changes
@@ -303,8 +269,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             right: MediaQuery.of(context).size.width * 0.2,
             bottom: MediaQuery.of(context).size.height * 0.5,
           ),
-          content: Text("There are no changes to the account name.",
-              textAlign: TextAlign.center),
+          content: Text("There are no changes to the account name.", textAlign: TextAlign.center),
         ),
       );
     } else {
@@ -322,10 +287,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             right: MediaQuery.of(context).size.width * 0.2,
             bottom: MediaQuery.of(context).size.height * 0.5,
           ),
-          content: Text(
-              success
-                  ? "Account name updated successfully!"
-                  : "Oops, something bad happened! Better luck next time.",
+          content: Text(success ? "Account name updated successfully!" : "Oops, something bad happened! Better luck next time.",
               textAlign: TextAlign.center),
         ),
       );
