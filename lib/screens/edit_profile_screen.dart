@@ -21,14 +21,17 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   final TextEditingController _usernameController = TextEditingController();
   Account retrievedAccount = Account();
   bool isUsingLocalImage = false;
+  Color editIcon = primaryMedium;
 
+  bool isEditing = false;
   final picker = ImagePicker();
   File _image;
   String imageUrl = kDefaultProfilePicture;
   String dataSent = "text"; // Either text or image
 
   Future getImage(String option) async {
-    final pickedFile = await picker.getImage(source: option == "Camera" ? ImageSource.camera : ImageSource.gallery);
+    final pickedFile = await picker.getImage(
+        source: option == "Camera" ? ImageSource.camera : ImageSource.gallery);
 
     setState(() {
       if (pickedFile != null) {
@@ -50,11 +53,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           IconButton(
             icon: Icon(Icons.save),
             onPressed: () async {
-              bool success = true;
+              bool success = false;
               if (isUsingLocalImage)
-                success = await updateAccountName(context, widget.userId, _usernameController.text) && await updateAccountProfilePicture(context);
-              else
-                success = await updateAccountName(context, widget.userId, _usernameController.text);
+                success = await updateAccountProfilePicture(context);
               if (success) setState(() {});
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
@@ -64,7 +65,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     right: MediaQuery.of(context).size.width * 0.2,
                     bottom: MediaQuery.of(context).size.height * 0.5,
                   ),
-                  content: Text(success ? "Everything went A-OK!" : "Oops, try again.", textAlign: TextAlign.center),
+                  content: Text(
+                      success ? "Everything went A-OK!" : "Oops, try again.",
+                      textAlign: TextAlign.center),
                 ),
               );
             },
@@ -79,79 +82,162 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             retrievedAccount.name = accountSnapshot.data.name;
             retrievedAccount.email = accountSnapshot.data.email;
             retrievedAccount.profilePic = accountSnapshot.data.profilePic;
+            _usernameController.text = retrievedAccount.name;
+            _usernameController.selection = TextSelection.fromPosition(
+                TextPosition(offset: _usernameController.text.length));
 
             return Container(
-              constraints: BoxConstraints.expand(),
               alignment: Alignment.center,
-              child: ListView(
-                padding: EdgeInsets.symmetric(
-                  vertical: MediaQuery.of(context).size.height * 0.06,
-                  horizontal: MediaQuery.of(context).size.width * 0.1,
-                ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Stack(
-                    alignment: Alignment.topCenter,
-                    children: [
-                      CircleAvatar(
-                        backgroundColor: Theme.of(context).primaryColorLight,
-                        maxRadius: MediaQuery.of(context).size.width * 0.3,
-                        backgroundImage: !isUsingLocalImage // If not using local image, use retrieved
-                            ? (retrievedAccount.profilePic.isEmpty ? AssetImage('assets/defaultpp.jpg') : NetworkImage(retrievedAccount.profilePic))
-                            : (_image != null ? Image.file(_image, fit: BoxFit.cover).image : AssetImage('assets/defaultpp.jpg')), // Else, use local
-                      ),
-                      Positioned(
-                        top: 10.0,
-                        right: 20.0,
-                        child: MaterialButton(
-                          shape: CircleBorder(),
-                          color: Colors.white,
-                          height: 60.0,
-                          child: Icon(
-                            Icons.edit,
-                            color: Theme.of(context).primaryColorDark,
-                            size: 40.0,
-                          ),
-                          onPressed: () async {
-                            bool success = false;
-                            try {
-                              String imgSrc = await showDialog(context: context, builder: (BuildContext context) => PictureSourceSimpleDialog());
-                              getImage(imgSrc);
-                              success = true;
-                            } on Exception catch (e) {
-                              print(e.toString());
-                            }
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                behavior: SnackBarBehavior.floating,
-                                margin: EdgeInsets.only(
-                                  left: MediaQuery.of(context).size.width * 0.2,
-                                  right: MediaQuery.of(context).size.width * 0.2,
-                                  bottom: MediaQuery.of(context).size.height * 0.5,
-                                ),
-                                content: Text(success ? "Image loaded successfully." : "Oops, try again.", textAlign: TextAlign.center),
-                              ),
-                            );
-                          },
+                  Spacer(),
+                  Container(
+                    width: MediaQuery.of(context).size.width * 0.6,
+                    child: Stack(
+                      alignment: Alignment.topCenter,
+                      children: [
+                        CircleAvatar(
+                          backgroundColor: Theme.of(context).primaryColorLight,
+                          maxRadius: MediaQuery.of(context).size.width * 0.3,
+                          backgroundImage:
+                              !isUsingLocalImage // If not using local image, use retrieved
+                                  ? (retrievedAccount.profilePic.isEmpty
+                                      ? AssetImage('assets/defaultpp.jpg')
+                                      : NetworkImage(
+                                          retrievedAccount.profilePic))
+                                  : (_image != null
+                                      ? Image.file(_image, fit: BoxFit.cover)
+                                          .image
+                                      : AssetImage(
+                                          'assets/defaultpp.jpg')), // Else, use local
                         ),
-                      ),
-                    ],
-                  ),
-                  Padding(padding: EdgeInsets.symmetric(vertical: 20.0)),
-                  TextFormField(
-                    controller: _usernameController,
-                    textCapitalization: TextCapitalization.sentences,
-                    decoration: InputDecoration(
-                      labelText: retrievedAccount.name,
-                      labelStyle: TextStyle(color: Colors.black, fontSize: 26.0, decorationColor: Colors.red),
-                      hintText: "Input new name",
-                      icon: Icon(Icons.edit, color: Theme.of(context).primaryColorDark),
+                        Container(
+                          alignment: Alignment.topRight,
+                          child: MaterialButton(
+                            shape: CircleBorder(),
+                            color: Colors.white,
+                            height: 60.0,
+                            child: Icon(
+                              Icons.edit,
+                              color: Theme.of(context).primaryColorDark,
+                              size: 40.0,
+                            ),
+                            onPressed: () async {
+                              bool success = false;
+                              try {
+                                String imgSrc = await showDialog(
+                                    context: context,
+                                    builder: (BuildContext context) =>
+                                        PictureSourceSimpleDialog());
+                                getImage(imgSrc);
+                                success = true;
+                              } on Exception catch (e) {
+                                print(e.toString());
+                              }
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  behavior: SnackBarBehavior.floating,
+                                  margin: EdgeInsets.only(
+                                    left:
+                                        MediaQuery.of(context).size.width * 0.2,
+                                    right:
+                                        MediaQuery.of(context).size.width * 0.2,
+                                    bottom: MediaQuery.of(context).size.height *
+                                        0.5,
+                                  ),
+                                  content: Text(
+                                      success
+                                          ? "Image loaded successfully."
+                                          : "Oops, try again.",
+                                      textAlign: TextAlign.center),
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                  Padding(padding: EdgeInsets.symmetric(vertical: 10.0)),
-                  Text(
-                    "Email: ${retrievedAccount.email}",
-                    style: TextStyle(color: Colors.black, fontSize: 20.0),
+                  Spacer(),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(
+                        height: MediaQuery.of(context).size.height * 0.07,
+                        width: MediaQuery.of(context).size.width * 0.7,
+                        child: TextFormField(
+                          enabled: isEditing,
+                          controller: _usernameController,
+                          textCapitalization: TextCapitalization.sentences,
+                          style:
+                              TextStyle(color: Theme.of(context).accentColor),
+                          decoration: InputDecoration(
+                              filled: true,
+                              fillColor: isEditing
+                                  ? Theme.of(context).primaryColorLight
+                                  : Colors.grey,
+                              border: OutlineInputBorder(
+                                borderSide: BorderSide.none,
+                                borderRadius: BorderRadius.circular(15.0),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderSide: BorderSide(
+                                  width: 1,
+                                  color: Theme.of(context).accentColor,
+                                ),
+                                borderRadius: BorderRadius.circular(15.0),
+                              ),
+                              errorStyle: Theme.of(context).textTheme.subtitle2,
+                              errorBorder: OutlineInputBorder(
+                                  borderSide:
+                                      BorderSide(width: 1, color: Colors.red),
+                                  borderRadius: BorderRadius.circular(15.0)),
+                              suffixIcon: IconButton(
+                                icon: Icon(Icons.close_rounded),
+                                onPressed: () {
+                                  _usernameController.text = "";
+                                },
+                              )),
+                        ),
+                      ),
+                      IconButton(
+                          icon: Icon(isEditing ? Icons.check : Icons.edit,
+                              color: editIcon, size: 30),
+                          onPressed: () async {
+                            if (isEditing && _usernameController.text != "") {
+                              await updateAccountName(context,
+                                  widget.userId, _usernameController.text);
+                            }
+                            setState(() {
+                              isEditing = !isEditing;
+                              editIcon = (editIcon !=
+                                      Theme.of(context).primaryColorLight)
+                                  ? Theme.of(context).primaryColorLight
+                                  : Theme.of(context).primaryColorDark;
+                            });
+                          }),
+                    ],
                   ),
+                  Container(
+                    margin: EdgeInsets.symmetric(vertical: 10),
+                    padding: EdgeInsets.symmetric(horizontal: 10),
+                    alignment: Alignment.centerLeft,
+                    height: MediaQuery.of(context).size.height * 0.07,
+                    width: MediaQuery.of(context).size.width * 0.8,
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.all(Radius.circular(15)),
+                        color: Theme.of(context).primaryColor),
+                    child: FittedBox(
+                      child: Text(
+                        retrievedAccount.email,
+                        style: TextStyle(
+                          color: Theme.of(context).accentColor,
+                        ),
+                      ),
+                    ),
+                  ),
+                  Spacer(flex: 4),
                 ],
               ),
             );
@@ -166,7 +252,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       final _firebaseStorage = firebase_storage.FirebaseStorage.instance;
       if (_image != null) {
         //Upload to Firebase
-        var snapshot = await _firebaseStorage.ref().child('${widget.userId}/$imgName').putFile(_image);
+        var snapshot = await _firebaseStorage
+            .ref()
+            .child('${widget.userId}/$imgName')
+            .putFile(_image);
         // Get image from firebase
         String downloadUrl = await snapshot.ref.getDownloadURL();
         updateAccountProfilePictureFirestore(widget.userId, downloadUrl);
@@ -191,14 +280,18 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           right: MediaQuery.of(context).size.width * 0.2,
           bottom: MediaQuery.of(context).size.height * 0.5,
         ),
-        content: Text(success ? "Account picture updated successfully!" : "Oops, something bad happened! Try uploading your selfies next time.",
+        content: Text(
+            success
+                ? "Account picture updated successfully!"
+                : "Oops, something bad happened! Try uploading your selfies next time.",
             textAlign: TextAlign.center),
       ),
     );
     return success;
   }
 
-  Future<bool> updateAccountName(BuildContext context, String userId, String newUsername) async {
+  Future<bool> updateAccountName(
+      BuildContext context, String userId, String newUsername) async {
     bool success = true;
     if (_usernameController.text == retrievedAccount.name) {
       // No changes
@@ -210,7 +303,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             right: MediaQuery.of(context).size.width * 0.2,
             bottom: MediaQuery.of(context).size.height * 0.5,
           ),
-          content: Text("There are no changes to the account name.", textAlign: TextAlign.center),
+          content: Text("There are no changes to the account name.",
+              textAlign: TextAlign.center),
         ),
       );
     } else {
@@ -228,7 +322,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             right: MediaQuery.of(context).size.width * 0.2,
             bottom: MediaQuery.of(context).size.height * 0.5,
           ),
-          content: Text(success ? "Account name updated successfully!" : "Oops, something bad happened! Better luck next time.",
+          content: Text(
+              success
+                  ? "Account name updated successfully!"
+                  : "Oops, something bad happened! Better luck next time.",
               textAlign: TextAlign.center),
         ),
       );

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:messaging_app/database/flutterfire.dart';
 import 'package:messaging_app/models/Constants.dart';
+import 'package:messaging_app/widgets/alert_dialogs.dart';
 
 import 'home_screen.dart';
 
@@ -202,17 +203,19 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 child: Text('Register'),
                                 onPressed: () async {
                                   if (_formKey.currentState.validate()) {
-                                    bool successful = await register(
+                                    String message = await register(
                                         _email.text,
                                         _password.text,
                                         _name.text);
-                                    if (successful) {
+                                    if (message == "") {
                                       Navigator.pop(context);
                                       Navigator.pushReplacement(
                                           context,
                                           MaterialPageRoute(
                                               builder: (context) =>
                                                   HomeScreen()));
+                                    } else {
+                                      showAuthExceptionDialog(context, message);
                                     }
                                   }
                                 },

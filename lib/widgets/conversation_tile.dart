@@ -98,7 +98,7 @@ class _ConversationTileState extends State<ConversationTile> {
     return FutureBuilder(
       future: _retrieveData(),
       builder: (context, snapshot) {
-        if (!snapshot.hasData) return SizedBox(height: 0, width: 0);
+        if (!snapshot.hasData) return _buildConvoTile(context, snapshot, false);
         // Once latest message is retrieved
         if (!snapshot.data['convoName'].toLowerCase().contains(widget.searchFilter)) return SizedBox(height: 0, width: 0);
         latestMessage = snapshot.data['message'];
@@ -179,57 +179,63 @@ class _ConversationTileState extends State<ConversationTile> {
                 (value) => updateSeenTimeStamp(widget.conversationId),
               );
             },
-            child: Container(
-              height: 75.0,
-              width: MediaQuery.of(context).size.width,
-              padding: EdgeInsets.symmetric(horizontal: 10.0),
-              margin: EdgeInsets.symmetric(vertical: 1.0),
-              alignment: Alignment.center,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  // Profile Picture
-                  Padding(
-                    padding: const EdgeInsets.only(left: 10.0, right: 15.0),
-                    child: CircleAvatar(
-                      radius: 30.0,
-                      backgroundColor: Colors.white,
-                      backgroundImage: AssetImage('assets/defaultpp.jpg'),
-                    ),
-                  ),
-                  // Message Preview
-                  Expanded(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          "${snapshot.data['convoName']}", // Convo Name
-                          style: TextStyle(color: Colors.black, fontWeight: FontWeight.w700, fontSize: 16.0),
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Expanded(
-                              child: Text(
-                                latestMessage.senderId + (latestMessage.senderId == "" ? "" : ": ") + latestMessage.message,
-                                overflow: TextOverflow.ellipsis,
-                                style: TextStyle(color: isSeen ? Colors.grey : Theme.of(context).primaryColorLight),
-                              ),
-                            ),
-                            Text("$time", style: TextStyle(color: Colors.black)),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
+            child: _buildConvoTile(context, snapshot, true),
           ),
         );
       },
+    );
+  }
+
+  Container _buildConvoTile(BuildContext context, AsyncSnapshot snapshot, bool loaded) {
+    return Container(
+      height: 75.0,
+      width: MediaQuery.of(context).size.width,
+      padding: EdgeInsets.symmetric(horizontal: 10.0),
+      margin: EdgeInsets.symmetric(vertical: 1.0),
+      alignment: Alignment.center,
+      // color: loaded ? Colors.white : Colors.grey,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          // Profile Picture
+          Padding(
+            padding: const EdgeInsets.only(left: 10.0, right: 15.0),
+            child: CircleAvatar(
+              radius: 30.0,
+              backgroundColor: loaded ? Colors.white : Theme.of(context).primaryColorLight,
+              backgroundImage: loaded ? AssetImage('assets/defaultpp.jpg') : null,
+              child: loaded ? SizedBox(height: 0, width: 0) : CircularProgressIndicator(),
+            ),
+          ),
+          // Message Preview
+          Expanded(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  loaded ? "${snapshot.data['convoName']}" : "", // Convo Name
+                  style: TextStyle(color: Colors.black, fontWeight: FontWeight.w700, fontSize: 16.0),
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Text(
+                        loaded ? (latestMessage.senderId + (latestMessage.senderId == "" ? "" : ": ") + latestMessage.message) : "",
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(color: isSeen ? Colors.grey : Theme.of(context).primaryColorLight),
+                      ),
+                    ),
+                    Text(loaded ? "$time" : "", style: TextStyle(color: Colors.black)),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
