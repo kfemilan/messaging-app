@@ -36,18 +36,11 @@ class _NewConversationScreenState extends State<NewConversationScreen> {
                   print("Error creating conversation!");
                 } else {
                   final user2 = await getName(userID2);
-                  Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => ConversationScreen(
-                              conversationID: output, name: user2)));
+                  Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => ConversationScreen(conversationID: output, name: user2)))
+                      .then((value) => updateSeenTimeStamp(output));
                 }
               } else if (selected.length > 1) {
-                Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) =>
-                                ConfirmCreateScreen(selected: selected)))
+                Navigator.push(context, MaterialPageRoute(builder: (context) => ConfirmCreateScreen(selected: selected)))
                     .then((value) => setState(() {}));
               } else {
                 showErrorDialog();
@@ -76,9 +69,7 @@ class _NewConversationScreenState extends State<NewConversationScreen> {
                     filled: true,
                     fillColor: Theme.of(context).primaryColor,
                     hintText: 'Search',
-                    hintStyle: TextStyle(
-                        color: Theme.of(context).primaryColorDark,
-                        fontWeight: FontWeight.w600),
+                    hintStyle: TextStyle(color: Theme.of(context).primaryColorDark, fontWeight: FontWeight.w600),
                     border: OutlineInputBorder(
                       borderSide: BorderSide.none,
                       borderRadius: BorderRadius.circular(30.0),
@@ -116,47 +107,30 @@ class _NewConversationScreenState extends State<NewConversationScreen> {
                               return selected.isEmpty
                                   ? Text(
                                       'Select Users...',
-                                      style: TextStyle(
-                                          color: Theme.of(context)
-                                              .primaryColorDark),
+                                      style: TextStyle(color: Theme.of(context).primaryColorDark),
                                     )
                                   : Container(
                                       padding: EdgeInsets.all(5),
-                                      width: MediaQuery.of(context).size.width *
-                                          0.2,
-                                      height:
-                                          MediaQuery.of(context).size.height *
-                                              0.1,
+                                      width: MediaQuery.of(context).size.width * 0.2,
+                                      height: MediaQuery.of(context).size.height * 0.1,
                                       child: Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
+                                        mainAxisAlignment: MainAxisAlignment.center,
                                         children: [
                                           FittedBox(
                                             child: Stack(
                                               alignment: Alignment.topRight,
                                               children: [
                                                 CircleAvatar(
-                                                  radius: MediaQuery.of(context)
-                                                          .size
-                                                          .width *
-                                                      0.07,
-                                                  child: Text(selected[i]
-                                                      .name[0]
-                                                      .toUpperCase()),
+                                                  radius: MediaQuery.of(context).size.width * 0.07,
+                                                  child: Text(selected[i].name[0].toUpperCase()),
                                                 ),
                                                 Container(
                                                   width: 20,
                                                   height: 20,
                                                   child: FloatingActionButton(
-                                                      backgroundColor: Theme.of(
-                                                              context)
-                                                          .primaryColorLight,
+                                                      backgroundColor: Theme.of(context).primaryColorLight,
                                                       heroTag: selected[i].id,
-                                                      child: Icon(Icons.close,
-                                                          size: 15,
-                                                          color:
-                                                              Theme.of(context)
-                                                                  .accentColor),
+                                                      child: Icon(Icons.close, size: 15, color: Theme.of(context).accentColor),
                                                       onPressed: () {
                                                         removeFromSelected(i);
                                                       }),
@@ -165,32 +139,20 @@ class _NewConversationScreenState extends State<NewConversationScreen> {
                                             ),
                                           ),
                                           FittedBox(
-                                            child: Text(
-                                                selected[i].name.split(" ")[0],
-                                                style: TextStyle(
-                                                    color: Colors.black)),
+                                            child: Text(selected[i].name.split(" ")[0], style: TextStyle(color: Colors.black)),
                                           )
                                         ],
                                       ),
                                     );
                             },
                           ),
-                          decoration: BoxDecoration(
-                              border: Border(
-                                  bottom: BorderSide(
-                                      color:
-                                          Theme.of(context).primaryColorLight,
-                                      width: 2))),
+                          decoration: BoxDecoration(border: Border(bottom: BorderSide(color: Theme.of(context).primaryColorLight, width: 2))),
                         ),
                         Expanded(
                           // List of Users
                           child: StreamBuilder(
-                            stream: FirebaseFirestore.instance
-                                .collection('Users')
-                                .orderBy('name', descending: false)
-                                .snapshots(),
-                            builder: (BuildContext context,
-                                AsyncSnapshot<QuerySnapshot> snapshot) {
+                            stream: FirebaseFirestore.instance.collection('Users').orderBy('name', descending: false).snapshots(),
+                            builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
                               if (!snapshot.hasData) {
                                 return Center(
                                   child: CircularProgressIndicator(),
@@ -199,44 +161,24 @@ class _NewConversationScreenState extends State<NewConversationScreen> {
 
                               return ListView(
                                 children: snapshot.data.docs.map((document) {
-                                  String uID =
-                                      FirebaseAuth.instance.currentUser.uid;
+                                  String uID = FirebaseAuth.instance.currentUser.uid;
                                   if (uID == document.id) {
                                     return SizedBox();
                                   }
                                   return Container(
                                     child: ListTile(
-                                      leading: CircleAvatar(
-                                          child: Text(document['name'][0]
-                                              .toString()
-                                              .toUpperCase())),
-                                      title: Text(document['name'],
-                                          style: TextStyle(
-                                              color: Theme.of(context)
-                                                  .primaryColorDark)),
-                                      selected: (selected.firstWhere(
-                                                  (sel) =>
-                                                      sel.id == document.id,
-                                                  orElse: () => null) ==
-                                              null)
-                                          ? false
-                                          : true,
-                                      selectedTileColor:
-                                          Theme.of(context).primaryColorLight,
+                                      leading: CircleAvatar(child: Text(document['name'][0].toString().toUpperCase())),
+                                      title: Text(document['name'], style: TextStyle(color: Theme.of(context).primaryColorDark)),
+                                      selected: (selected.firstWhere((sel) => sel.id == document.id, orElse: () => null) == null) ? false : true,
+                                      selectedTileColor: Theme.of(context).primaryColorLight,
                                       onTap: () {
                                         userID2 = document.id;
-                                        Account temp = new Account(
-                                            id: document.id,
-                                            name: document['name'],
-                                            email: document['email']);
-                                        var contain = selected.where(
-                                            (element) => element.id == temp.id);
+                                        Account temp = new Account(id: document.id, name: document['name'], email: document['email']);
+                                        var contain = selected.where((element) => element.id == temp.id);
                                         if (contain.isEmpty) {
                                           addToSelected(temp);
                                         } else {
-                                          var i = selected.indexWhere(
-                                              (element) =>
-                                                  element.id == document.id);
+                                          var i = selected.indexWhere((element) => element.id == document.id);
                                           removeFromSelected(i);
                                         }
                                       },
@@ -276,8 +218,7 @@ class _NewConversationScreenState extends State<NewConversationScreen> {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: Text('No User Selected!',
-                style: Theme.of(context).textTheme.headline3),
+            title: Text('No User Selected!', style: Theme.of(context).textTheme.headline3),
             content: Text('Please select a user to start a conversation.'),
             actions: [
               TextButton(
@@ -287,8 +228,7 @@ class _NewConversationScreenState extends State<NewConversationScreen> {
                 },
               )
             ],
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.all(Radius.circular(15))),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(15))),
           );
         });
   }
