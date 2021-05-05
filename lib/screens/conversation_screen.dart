@@ -5,6 +5,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:messaging_app/database/flutterfire.dart';
+import 'package:messaging_app/models/Account.dart';
 import 'package:messaging_app/models/Constants.dart';
 import 'package:messaging_app/models/Message.dart';
 import 'package:messaging_app/widgets/chat_bubble.dart';
@@ -155,11 +157,14 @@ class _ConversationScreenState extends State<ConversationScreen> {
           ),
           actions: [
             IconButton(
-              onPressed: () {
-                print(getTimeDifference());
-              },
-              icon: Image.network(kDefaultProfilePicture),
-            )
+                onPressed: () async {
+                  List people = await getMembers();
+                  print(people);
+                  showMemberDialog(context, people);
+                },
+                icon: Icon(
+                  Icons.more_horiz,
+                ))
           ],
         ),
         body: Column(
@@ -301,5 +306,52 @@ class _ConversationScreenState extends State<ConversationScreen> {
             ),
           ],
         ));
+  }
+
+  showMemberDialog(context, people) async {
+    List<Account> accountList = [];
+    for (var x = 0; x < people.length; x++) {
+      Account temp = await getAccount(people[x]);
+      accountList.add(temp);
+    }
+
+    return showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(
+            'Members',
+            style: Theme.of(context).textTheme.headline3,
+          ),
+          content: Container(
+            height: MediaQuery.of(context).size.height * 0.15,
+            width: MediaQuery.of(context).size.width * 0.6,
+            child: ListView.builder(
+              itemCount: people.length,
+              itemBuilder: (context, i) {
+                return ListTile(
+                  leading: CircleAvatar(
+                      child: Text(accountList[i].name[0].toUpperCase())),
+                  title: Text(
+                    accountList[i].name,
+                    style: TextStyle(color: Theme.of(context).primaryColorDark),
+                  ),
+                  selectedTileColor: Theme.of(context).primaryColorLight,
+                );
+              },
+            ),
+          ),
+          actions: [
+            TextButton(
+              child: Text('Ok'),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
+          ],
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(15))),
+        );
+      },
+    );
   }
 }
