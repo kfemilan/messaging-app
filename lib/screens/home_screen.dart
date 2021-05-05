@@ -39,17 +39,17 @@ class _HomeScreenState extends State<HomeScreen> {
                 decoration: BoxDecoration(color: Colors.white),
               ),
             ),
-            ListTile(
-              leading: Icon(Icons.group, color: Theme.of(context).primaryColorLight),
-              title: Text(
-                "Conversations",
-                style: TextStyle(
-                  fontSize: 20.0,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              onTap: () => Navigator.push(context, MaterialPageRoute(builder: (builder) => HomeScreen())),
-            ),
+            // ListTile(
+            //   leading: Icon(Icons.group, color: Theme.of(context).primaryColorLight),
+            //   title: Text(
+            //     "Conversations",
+            //     style: TextStyle(
+            //       fontSize: 20.0,
+            //       fontWeight: FontWeight.bold,
+            //     ),
+            //   ),
+            //   onTap: () => Navigator.push(context, MaterialPageRoute(builder: (builder) => HomeScreen())),
+            // ),
             ListTile(
               leading: Icon(Icons.person, color: Theme.of(context).primaryColorLight),
               title: Text(

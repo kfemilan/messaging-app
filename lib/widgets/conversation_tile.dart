@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:messaging_app/models/Account.dart';
 
 import 'package:messaging_app/models/Message.dart';
 import 'package:messaging_app/screens/conversation_screen.dart';
@@ -76,19 +77,40 @@ class _ConversationTileState extends State<ConversationTile> {
     return false;
   }
 
+  Future<ImageProvider> _getConvoImage() async {
+    if (widget.name != "") return AssetImage('assets/defaultpp.jpg');
+    try {
+      DocumentSnapshot convoSnapshot = await FirebaseFirestore.instance.collection('Conversations').doc(widget.conversationId).get();
+      List<dynamic> userIds = convoSnapshot.data()['people'];
+      String userToGetImg = userIds[0] == currentUserId ? userIds[1] : userIds[0];
+      Account user = await getAccount(userToGetImg);
+      return user.profilePic.isEmpty ? AssetImage('assets/defaultpp.jpg') : NetworkImage(user.profilePic);
+    } on Exception catch (e) {
+      print(e.toString());
+      return AssetImage('assets/defaultpp.jpg');
+    }
+  }
+
   Future<Map<String, dynamic>> _retrieveData() async {
     try {
       String dmName = await _getDMName();
       Message message = await _getLatestMessage();
       bool hasSeen = await _getIsSeen(message.timeSent);
-      return {'convoName': dmName, 'message': message, 'isSeen': hasSeen};
+      ImageProvider image = await _getConvoImage();
+      return {
+        'convoName': dmName,
+        'message': message,
+        'isSeen': hasSeen,
+        'convoImage': image,
+      };
     } on Exception catch (e) {
       print(e.toString());
     }
     return {
       'convoName': "Error",
       'message': Message(message: "Error retrieving Message", timeSent: DateTime.now(), senderId: "Error"),
-      'isSeen': false
+      'isSeen': false,
+      'convoImage': AssetImage('assets/defaultpp.jpg'),
     };
   }
 
@@ -204,7 +226,7 @@ class _ConversationTileState extends State<ConversationTile> {
             child: CircleAvatar(
               radius: 30.0,
               backgroundColor: loaded ? Colors.white : Theme.of(context).primaryColorLight,
-              backgroundImage: loaded ? AssetImage('assets/defaultpp.jpg') : null,
+              backgroundImage: loaded ? snapshot.data['convoImage'] : null,
               child: loaded ? SizedBox(height: 0, width: 0) : CircularProgressIndicator(),
             ),
           ),
