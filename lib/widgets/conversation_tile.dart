@@ -2,8 +2,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:messaging_app/models/Account.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
+import 'package:messaging_app/models/Account.dart';
 import 'package:messaging_app/models/Message.dart';
 import 'package:messaging_app/screens/conversation_screen.dart';
 import 'package:messaging_app/database/flutterfire.dart';
@@ -23,7 +24,7 @@ class _ConversationTileState extends State<ConversationTile> {
   bool isSeen = false;
   final String currentUserId = FirebaseAuth.instance.currentUser.uid;
 
-  Future<String> _getDMName() async {
+  Future<String> _getConvoName() async {
     if (widget.name != "") return widget.name;
     try {
       DocumentSnapshot convoSnapshot = await FirebaseFirestore.instance.collection('Conversations').doc(widget.conversationId).get();
@@ -77,14 +78,14 @@ class _ConversationTileState extends State<ConversationTile> {
     return false;
   }
 
-  Future<ImageProvider> _getConvoImage() async {
+  Future<dynamic> _getConvoImage() async {
     if (widget.name != "") return AssetImage('assets/defaultpp.jpg');
     try {
       DocumentSnapshot convoSnapshot = await FirebaseFirestore.instance.collection('Conversations').doc(widget.conversationId).get();
       List<dynamic> userIds = convoSnapshot.data()['people'];
       String userToGetImg = userIds[0] == currentUserId ? userIds[1] : userIds[0];
       Account user = await getAccount(userToGetImg);
-      return user.profilePic.isEmpty ? AssetImage('assets/defaultpp.jpg') : NetworkImage(user.profilePic);
+      return user.profilePic.isEmpty ? AssetImage('assets/defaultpp.jpg') : CachedNetworkImageProvider(user.profilePic);
     } on Exception catch (e) {
       print(e.toString());
       return AssetImage('assets/defaultpp.jpg');
@@ -93,10 +94,10 @@ class _ConversationTileState extends State<ConversationTile> {
 
   Future<Map<String, dynamic>> _retrieveData() async {
     try {
-      String dmName = await _getDMName();
+      String dmName = await _getConvoName();
       Message message = await _getLatestMessage();
       bool hasSeen = await _getIsSeen(message.timeSent);
-      ImageProvider image = await _getConvoImage();
+      dynamic image = await _getConvoImage();
       return {
         'convoName': dmName,
         'message': message,
@@ -226,7 +227,8 @@ class _ConversationTileState extends State<ConversationTile> {
             child: CircleAvatar(
               radius: 30.0,
               backgroundColor: loaded ? Colors.white : Theme.of(context).primaryColorLight,
-              backgroundImage: loaded ? snapshot.data['convoImage'] : null,
+              backgroundImage: loaded ? AssetImage('assets/defaultpp.jpg') : null,
+              foregroundImage: loaded ? snapshot.data['convoImage'] : null,
               child: loaded ? SizedBox(height: 0, width: 0) : CircularProgressIndicator(),
             ),
           ),
