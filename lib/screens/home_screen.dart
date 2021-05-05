@@ -39,17 +39,17 @@ class _HomeScreenState extends State<HomeScreen> {
                 decoration: BoxDecoration(color: Colors.white),
               ),
             ),
-            ListTile(
-              leading: Icon(Icons.group, color: Theme.of(context).primaryColorLight),
-              title: Text(
-                "Conversations",
-                style: TextStyle(
-                  fontSize: 20.0,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              onTap: () => Navigator.push(context, MaterialPageRoute(builder: (builder) => HomeScreen())),
-            ),
+            // ListTile(
+            //   leading: Icon(Icons.group, color: Theme.of(context).primaryColorLight),
+            //   title: Text(
+            //     "Conversations",
+            //     style: TextStyle(
+            //       fontSize: 20.0,
+            //       fontWeight: FontWeight.bold,
+            //     ),
+            //   ),
+            //   onTap: () => Navigator.push(context, MaterialPageRoute(builder: (builder) => HomeScreen())),
+            // ),
             ListTile(
               leading: Icon(Icons.person, color: Theme.of(context).primaryColorLight),
               title: Text(
@@ -160,9 +160,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ? ListView.builder(
                         itemCount: mappedDocs.length,
                         itemBuilder: (BuildContext context, index) {
-                          return mappedDocs[index]['name'].toLowerCase().contains(_searchConvo.value.text.toLowerCase())
-                              ? ConversationTile(mappedDocs[index]['convoId'], mappedDocs[index]['name'])
-                              : SizedBox(width: 0, height: 0);
+                          return ConversationTile(mappedDocs[index]['convoId'], mappedDocs[index]['name'], _searchConvo.text.toLowerCase());
                         })
                     : Container(
                         width: MediaQuery.of(context).size.width * 0.9,
